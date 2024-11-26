@@ -39,6 +39,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
+          passphrase: ${{ secrets.SERVER_PASSPHRASE }}
           script: |
             export IMAGE_TAG=${{ steps.vars.outputs.sha_short }}
             echo "IMAGE_TAG=${IMAGE_TAG}"
