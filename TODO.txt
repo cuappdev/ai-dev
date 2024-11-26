@@ -3,3 +3,5 @@ General flow
 2 - If not signed in, redirected to ai.cornellappdev.com/api/login then redirected back to ai.cornellappdev.com
 3 - When a user types in a prompt, create a new chat for them, redirect to ai.cornellappdev.com/chat/uuid
 4 - 
+
+CHANGE SSH token to no passphrase
