@@ -1,8 +1,8 @@
 'use client';
 
 import { usePathname } from "next/navigation";
-import { Suspense } from "react";
 import ChatMessage from "./chatMessage";
+import Protected from "@/app/components/Protected";
 
 export default function ChatPage() {
   const pathname = usePathname();
@@ -10,11 +10,11 @@ export default function ChatPage() {
 
   return (
     <div>
-      <Suspense>
+      <Protected>
         <h1>Chat Page</h1>
         <h2>Chat ID: {chatId}</h2>
         <ChatMessage />
-      </Suspense>
+      </Protected>
     </div>
   );
 }
