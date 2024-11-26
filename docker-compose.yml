@@ -1,10 +1,11 @@
 services:
   ollama:
-    image: ollama/llama3.2:1b
+    image: ollama/ollama
     ports:
       - "11434:11434"
     networks:
       - app-network
+    command: ["docker", "exec", "ollama", "ollama", "run", "llama3.2:1b"]
 
   ai-dev-app:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
