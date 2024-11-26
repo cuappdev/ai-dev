@@ -1,0 +1,21 @@
+services:
+  ollama:
+    image: ollama/llama3.2:1b
+    ports:
+      - "11434:11434"
+    networks:
+      - app-network
+
+  ai-dev-app:
+    image: cornellappdev/ai-dev:${IMAGE_TAG}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - ollama
+    networks:
+      - app-network
+
+networks:
+  app-network:
