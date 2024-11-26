@@ -5,7 +5,7 @@ services:
       - "11434:11434"
     networks:
       - app-network
-    command: ["docker", "exec", "ollama", "ollama", "run", "llama3.2:1b"]
+    command: ["ollama", "run", "llama3.2:1b"]
 
   ai-dev-app:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
