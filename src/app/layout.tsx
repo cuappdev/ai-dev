@@ -1,4 +1,4 @@
-import { AuthProvider } from '../contexts/AuthContext';
+import Providers from "./Providers";
 import type { Metadata } from "next";
 import "@/globals.css";
 
@@ -18,9 +18,9 @@ export default function RootLayout({
         {/* TODO: Add more metadata here */}
       </head>
       <body>
-        <AuthProvider>
+        <Providers>
           {children}
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

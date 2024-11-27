@@ -1,10 +1,10 @@
 
 'use client';
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function LoginPage() {
-  const {signInWithGoogle} = useAuth();
+  const { signInWithGoogle } = useAuth();
 
   return (
     <main className="flex flex-col items-center justify-center gap-16 h-screen">
@@ -20,7 +20,7 @@ export default function LoginPage() {
             Welcome to AI Dev!
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            Login with your Cornell account
+            Login with your Cornell email account
           </p>
         </div>
         

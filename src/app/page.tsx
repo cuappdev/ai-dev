@@ -1,28 +1,27 @@
 'use client';
 
 import { useAuth } from "../contexts/AuthContext";
-import LoginPage from "./LoginPage";
+import LoginPage from "./components/LoginPage";
+import InitialChatPage from "./components/InitialChatPage";
+import Spinner from "./components/Spinner";
+import Protected from "./components/Protected";
 
 export default function Home() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
-    // TODO: Add loading
-    return <div>Loading...</div>
+    return <Spinner />;
   }
 
   return (
     <>
-      {user ? 
-        (<div>
-          <h1>
-            You are signed in!
-          </h1>
-          {user.photoURL && <img src={user.photoURL} alt={`${user.displayName}'s avatar`} />}
-          <button onClick={signOut}>Sign Out</button>
-        </div>)
+      {user ?
+        <Protected>
+          <InitialChatPage />
+        </Protected>
       :
-      <LoginPage />}
+        <LoginPage />
+      }
     </>
   );
 }
