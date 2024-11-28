@@ -28,6 +28,8 @@ export default function ChatHistoryNavbar({ toggleNavbar, isNavbarOpen }: ChatHi
       // setChatHistory(data);
       
       await new Promise(resolve => setTimeout(resolve, 2000));
+      setChatHistory({messages: []});
+
       setLoadingHistory(false);
     }
 

@@ -18,6 +18,12 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+interface FirebaseAuthError {
+  code: string;
+  message: string;
+  name: string;
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
@@ -38,9 +44,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await signInWithPopup(auth, provider);
       setError(null);
-    } catch (error: any) {
-      setError(error.message);
-      console.log(error);
+    } catch (error) {
+      setError((error as FirebaseAuthError).message);
     }
   };
 
@@ -49,8 +54,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await firebaseSignOut(auth);
       setUser(null);
       setError(null);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError((error as FirebaseAuthError).message);
     }
   };
 
