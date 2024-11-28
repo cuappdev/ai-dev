@@ -13,6 +13,7 @@ import { auth } from '@/firebase';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  error: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -20,6 +21,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  error: null,
   signInWithGoogle: async () => {},
   signOut: async () => {},
 });
@@ -29,21 +31,26 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error during sign-in:', error);
+      setError(null);
+    } catch (error: any) {
+      setError(error.message);
+      console.log(error);
     }
   };
 
   const signOutUser = async () => {
     try {
       await firebaseSignOut(auth);
-    } catch (error) {
-      console.error('Error during sign-out:', error);
+      setUser(null);
+      setError(null);
+    } catch (error: any) {
+      setError(error.message);
     }
   };
 
@@ -56,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut: signOutUser }}>
+    <AuthContext.Provider value={{ user, loading, error, signInWithGoogle, signOut: signOutUser }}>
       {children}
     </AuthContext.Provider>
   );

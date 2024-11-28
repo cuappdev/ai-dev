@@ -6,6 +6,5 @@ export interface ChatMessage {
 }
 
 export interface ChatHistory {
-  userId: string;
   messages: ChatMessage[];
 }

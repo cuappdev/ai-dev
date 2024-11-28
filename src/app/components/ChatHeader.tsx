@@ -1,25 +1,31 @@
-import { useAuth } from "@/contexts/AuthContext";
 import { useModel } from "@/contexts/ModelContext";
 import { ListModelResponse } from "@/types/model";
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 
 export default function ChatHeader() {
-  const { user, signOut } = useAuth();
   const { selectedModel, setSelectedModel } = useModel();
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [availableModels, setAvailableModels] = useState<ListModelResponse>({ models: [] });
+  const [availableModels, setAvailableModels] = useState<ListModelResponse>({ models: [
+    { name: "model1",
+      model: "model1",
+      modified_at: "2021-09-01T00:00:00Z",
+      size: 1000,
+      digest: "1234567890abcdef",
+      details: {
+        parent_model: "model0",
+        format: "onnx",
+        family: "transformers",
+        families: ["transformers"],
+        parameter_size: "1000",
+        quantization_level: "0",
+      },
+     },
+  ] });
   const modelDropdownRef = useRef<HTMLDivElement>(null);
-  const userDropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleModelDropdown = () => {
     fetchModels();
     setModelDropdownOpen(!modelDropdownOpen);
-  }
-
-  const toggleUserDropdown = () => {
-    setUserDropdownOpen(!userDropdownOpen);
   }
 
   const selectModel = (model: string) => {
@@ -40,12 +46,6 @@ export default function ChatHeader() {
     ) {
       setModelDropdownOpen(false);
     }
-    if (
-      userDropdownRef.current &&
-      !userDropdownRef.current.contains(event.target as Node)
-    ) {
-      setUserDropdownOpen(false);
-    }
   };
 
   useEffect(() => {
@@ -56,45 +56,24 @@ export default function ChatHeader() {
   }, []);
 
   return (
-    <div className="flex flex-row p-2 pt-3 justify-between m-auto items-center w-11/12">
+    <div className="flex flex-row pt-3 justify-end items-center w-11/12 m-auto">
       <div className="relative" ref={modelDropdownRef}>
-        <button onClick={toggleModelDropdown} className="flex flex-row items-center gap-1 rounded-md p-2 hover:bg-slate-800">
-          <span className="font-bold text-xl">{selectedModel}</span>
+        <button onClick={toggleModelDropdown} className="flex flex-row text-black hover:opacity-80 items-center gap-1 p-2">
+          <span className="font-semibold text-lg">{selectedModel}</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </button>
         {modelDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+          <div className="absolute top-full right-0 w-full max-w-xs rounded-md shadow-lg z-10 bg-gray-100">
             {availableModels.models.map((model, index) => (
               <button
                 key={index}
                 onClick={() => selectModel(model.name)}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
+                className="block w-full text-left px-4 py-2 text-sm text-secondaryColor hover:bg-gray-200 hover:rounded-md">
                 {model.name}
               </button>
             ))}
-          </div>
-        )}
-      </div>
-      
-      <div className="relative" ref={userDropdownRef}>
-        <button onClick={toggleUserDropdown} className="flex flex-row rounded-md p-2 items-center gap-2 hover:bg-slate-800">
-          <Image className="rounded-full" src={user!.photoURL!} alt={`${user!.displayName}'s avatar`} width={30} height={30} />
-          <h1>{user!.displayName}</h1>
-        </button>
-        {userDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-            <button
-              onClick={signOut}
-              className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:rounded-md"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5m0 10v1m0-10V5"></path>
-              </svg>
-              Sign out
-            </button>
           </div>
         )}
       </div>
