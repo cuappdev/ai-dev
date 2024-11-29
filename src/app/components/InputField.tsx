@@ -1,22 +1,49 @@
 import { useModel } from "@/contexts/ModelContext";
-import { useState, useRef } from "react";
+import { useState, useRef, FormEvent } from "react";
 
-export default function InputField() {
+interface InputFieldProps {
+  onSubmit: (message: string) => void;
+}
+
+export default function InputField({ onSubmit }: InputFieldProps) {
   const { selectedModel } = useModel();
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
+  const handleSubmit = (e: FormEvent) => {
+    if (message.trim() === "") return;
+    e.preventDefault();
+    onSubmit(message.trim());
+    setMessage("");
+    resetTextareaHeight();
+  }
 
+  const resetTextareaHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      handleSubmit(e);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+    autoResizeTextarea();
+  };
+
+  const autoResizeTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }
+
   return (
-    <div className="flex w-4/6 m-auto items-center border border-secondaryColor rounded-lg px-4 py-2 bg-white shadow-sm">
+    <form onSubmit={handleSubmit} className="flex w-4/6 m-auto items-center border border-secondaryColor rounded-lg px-4 py-2 bg-white shadow-sm">
       {/* // TODO: Implement file upload */}
       {/* <button className="mr-3">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 text-black">
@@ -28,6 +55,7 @@ export default function InputField() {
         ref={textareaRef}
         value={message}
         onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
         placeholder={`Message ${selectedModel}`}
         className="flex-1 max-h-[150px] border-none outline-none text-gray-700 placeholder-gray-400 resize-none"
         rows={1}
@@ -38,6 +66,6 @@ export default function InputField() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
         </svg>
       </button>
-    </div>
+    </form>
   );
 }

@@ -18,7 +18,7 @@ export const useModel = () => {
 };
 
 export const ModelProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedModel, setSelectedModel] = useState<string>('llama3.2:1b');
+  const [selectedModel, setSelectedModel] = useState<string>(process.env.NEXT_PUBLIC_DEFAULT_MODEL!);
 
   return (
     <ModelContext.Provider value={{ selectedModel, setSelectedModel }}>

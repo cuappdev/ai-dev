@@ -5,22 +5,7 @@ import { useState, useEffect, useRef } from "react";
 export default function ChatHeader() {
   const { selectedModel, setSelectedModel } = useModel();
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
-  const [availableModels, setAvailableModels] = useState<ListModelResponse>({ models: [
-    { name: "model1",
-      model: "model1",
-      modified_at: "2021-09-01T00:00:00Z",
-      size: 1000,
-      digest: "1234567890abcdef",
-      details: {
-        parent_model: "model0",
-        format: "onnx",
-        family: "transformers",
-        families: ["transformers"],
-        parameter_size: "1000",
-        quantization_level: "0",
-      },
-     },
-  ] });
+  const [availableModels, setAvailableModels] = useState<ListModelResponse>({ models: [] });
   const modelDropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleModelDropdown = () => {
@@ -34,7 +19,7 @@ export default function ChatHeader() {
   }
 
   const fetchModels = async () => {
-    const response = await fetch("/api/models/list");
+    const response = await fetch("/api/models/all");
     const data = await response.json();
     setAvailableModels(data);
   }

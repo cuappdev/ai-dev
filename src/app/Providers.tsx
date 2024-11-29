@@ -1,8 +1,8 @@
 'use client';
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
-import { ModelProvider } from '../contexts/ModelContext'; // Import the ModelProvider
+import { ModelProvider } from '../contexts/ModelContext';
 
 interface ProvidersProps {
   children: ReactNode;

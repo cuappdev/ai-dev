@@ -5,14 +5,23 @@ import ChatHeader from "./ChatHeader";
 import InputField from "./InputField";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from "next/navigation";
 
 export default function InitialChatPage() {
   const { user } = useAuth();
   const [isNavbarOpen, setIsNavbarOpen] = useState(true);
   const firstName = user!.displayName?.split(" ")[0];
+  const router = useRouter();
 
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
+  }
+
+  const handleSendMessage = (message: string) => {
+    const chatId = uuidv4();
+    // TODO: Add the chat and message to the database
+    router.push(`/chat/${chatId}`);
   }
 
   return (
@@ -41,7 +50,7 @@ export default function InitialChatPage() {
         </div>
 
         <div className="mb-10">
-          <InputField />
+          <InputField onSubmit={handleSendMessage} />
         </div>
       </div>
     </div>
