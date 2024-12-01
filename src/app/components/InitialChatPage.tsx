@@ -19,8 +19,9 @@ export default function InitialChatPage() {
   }
 
   const handleSendMessage = (message: string) => {
-    const chatId = uuidv4();
     // TODO: Add the chat and message to the database
+    const chatId = uuidv4();
+    console.log(`Message: ${message}`);
     router.push(`/chat/${chatId}`);
   }
 
@@ -47,10 +48,11 @@ export default function InitialChatPage() {
         <div className="w-4/5 flex flex-grow flex-col gap-3 m-auto mt-10">
           <span className="font-semibold text-7xl">{`Hello, ${firstName}`}</span>
           <span className="text-primaryColor font-semibold text-3xl">How can I help you today?</span>
+          <span className="text-primaryColor font-semibold text-3xl">This page will work when I implement the db, just send anything below and type your prompt on the next page</span>
         </div>
 
         <div className="mb-10">
-          <InputField onSubmit={handleSendMessage} />
+          <InputField messageStreaming={false} onSubmit={handleSendMessage} />
         </div>
       </div>
     </div>

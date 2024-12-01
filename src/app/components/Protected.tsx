@@ -3,12 +3,13 @@
 import React, { ReactNode, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import Spinner from './Spinner';
 
 interface ProtectedProps {
   children: ReactNode;
 }
 
-const Protected = ({ children }: ProtectedProps) => {
+export default function Protected({ children }: ProtectedProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -20,13 +21,9 @@ const Protected = ({ children }: ProtectedProps) => {
 
   if (loading) {
     return (
-      <div className="spinner-container">
-        <div className="spinner"></div>
-      </div>
+      <Spinner />
     );
   }
 
   return <>{user ? children : null}</>;
 };
-
-export default Protected;

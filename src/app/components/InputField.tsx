@@ -3,15 +3,16 @@ import { useState, useRef, FormEvent } from "react";
 
 interface InputFieldProps {
   onSubmit: (message: string) => void;
+  messageStreaming: boolean;
 }
 
-export default function InputField({ onSubmit }: InputFieldProps) {
+export default function InputField({ onSubmit, messageStreaming }: InputFieldProps) {
   const { selectedModel } = useModel();
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: FormEvent) => {
-    if (message.trim() === "") return;
+    if (message.trim() === "" || messageStreaming) return;
     e.preventDefault();
     onSubmit(message.trim());
     setMessage("");
@@ -61,8 +62,8 @@ export default function InputField({ onSubmit }: InputFieldProps) {
         rows={1}
       />
 
-      <button className="ml-3">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`size-6 text-primaryColor ${message.length === 0 ? "opacity-60" : ""}`}>
+      <button type="submit" className="ml-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`size-6 text-primaryColor ${message.trim().length === 0 ? "opacity-60" : ""}`}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
         </svg>
       </button>
