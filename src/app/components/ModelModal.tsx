@@ -1,4 +1,4 @@
-import { CreateModelRequest, CreateModelResponse, PullModelRequest, PullModelResponse, DeleteModelRequest } from '@/types/model';
+import { CreateModelRequest, CreateModelResponse, PullModelRequest, PullModelResponse } from '@/types/model';
 import { useState, useEffect, useRef } from 'react';
 
 interface ModelModalProps {
@@ -92,9 +92,11 @@ export default function ModelModal({ onClose }: ModelModalProps) {
                 break;
               }
               
-            } catch (parseError: any) {
-              setError(parseError.message);
-              done = true;
+            } catch (parseError: unknown) {
+              if (parseError instanceof Error) {
+                setError(parseError.message);
+                done = true;
+              }
             }
           }
         }
@@ -109,13 +111,17 @@ export default function ModelModal({ onClose }: ModelModalProps) {
           if (response.status === 'success') {
             setSuccess(`Model ${option}ed successfully.`);
           }
-        } catch (parseError: any) {
-          setError(parseError.message);
+        } catch (parseError: unknown) {
+          if (parseError instanceof Error) {
+            setError(parseError.message);
+          }
         }
       }
 
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
     }
   };
 
@@ -190,8 +196,10 @@ export default function ModelModal({ onClose }: ModelModalProps) {
         throw new Error(data.error || 'Failed to delete the model.');
       }
       setSuccess('Model deleted successfully.');
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
     } finally {
       setLoading(false);
     }

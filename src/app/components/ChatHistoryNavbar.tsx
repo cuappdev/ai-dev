@@ -22,6 +22,9 @@ export default function ChatHistoryNavbar({ toggleNavbar, isNavbarOpen }: ChatHi
   const router = useRouter();
   const [chatHistory, setChatHistory] = useState<History>({ chats: [] });
   const [loadingHistory, setLoadingHistory] = useState(true);
+  
+  // So Next can Build
+  console.log(setChatHistory);
 
   useEffect(() => {
     const fetchChatHistory = async () => {

@@ -4,6 +4,8 @@ interface ModelInfoModalProps {
 
 
 export default function ModelInfoModal({ onClose }: ModelInfoModalProps) {
+  console.log(onClose);
+  
   return (
     <></>
   );
