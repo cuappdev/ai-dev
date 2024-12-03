@@ -9,6 +9,9 @@ import Protected from "./components/Protected";
 export default function Home() {
   const { user, loading } = useAuth();
 
+  console.log("Firebase API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+
+
   if (loading) {
     return (
       <div className="h-screen w-screen flex align-middle justify-center">
