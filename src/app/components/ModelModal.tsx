@@ -1,4 +1,4 @@
-import { CreateModelResponse, PullModelResponse } from '@/types/model';
+import { CreateModelRequest, CreateModelResponse, PullModelRequest, PullModelResponse, DeleteModelRequest } from '@/types/model';
 import { useState, useEffect, useRef } from 'react';
 
 interface ModelModalProps {
@@ -20,17 +20,15 @@ const modalOptions: ModalOptionConfig[] = [
 
 export default function ModelModal({ onClose }: ModelModalProps) {
   const [activeTab, setActiveTab] = useState<ModalOption>('create');
-  const modalRef = useRef<HTMLDivElement>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const createModelNameRef = useRef<HTMLInputElement>(null);
   const createModelfileRef = useRef<HTMLTextAreaElement>(null);
-
   const pullModelNameRef = useRef<HTMLInputElement>(null);
-
   const deleteModelNameRef = useRef<HTMLInputElement>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -44,7 +42,7 @@ export default function ModelModal({ onClose }: ModelModalProps) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  });
 
   const handleTabChange = (tab: ModalOption) => {
     setActiveTab(tab);
@@ -54,12 +52,77 @@ export default function ModelModal({ onClose }: ModelModalProps) {
     setLogs([]);
   }
 
+  const sendStreamedRequest = async (url: string, body: CreateModelRequest | PullModelRequest, option: ModalOption) => {
+    try {
+      const initialResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!initialResponse.ok || !initialResponse.body) {
+        const data = await initialResponse.json();
+        throw new Error(data.error || `Failed to ${option} the model.`);
+      }
+
+      const reader = initialResponse.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      let done = false;
+
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        done = streamDone;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const response: CreateModelResponse | PullModelResponse = JSON.parse(line);
+              setLogs((prevLogs) => [...prevLogs, response.status]);
+
+              if (response.status === 'success') {
+                setSuccess(`Model ${option}ed successfully.`);
+                done = true;
+                break;
+              }
+              
+            } catch (parseError: any) {
+              setError(parseError.message);
+              done = true;
+            }
+          }
+        }
+      }
+      
+      // Remaining data in the buffer
+      if (buffer.trim()) {
+        try {
+          const response: CreateModelResponse | PullModelResponse = JSON.parse(buffer);
+          setLogs((prevLogs) => [...prevLogs, response.status]);
+
+          if (response.status === 'success') {
+            setSuccess(`Model ${option}ed successfully.`);
+          }
+        } catch (parseError: any) {
+          setError(parseError.message);
+        }
+      }
+
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
   const createModel = async (e: React.FormEvent) => {
+    console.log(e);
     e.preventDefault();
     setLoading(true);
-    setSuccess(null);
-    setError(null);
-    setLogs([]);
 
     const model = createModelNameRef.current!.value.trim();
     const modelfile = createModelfileRef.current!.value.trim();
@@ -70,47 +133,19 @@ export default function ModelModal({ onClose }: ModelModalProps) {
       return;
     }
 
-    try {
-      const initialResponse = await fetch('http://localhost:11434/api/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ model: model, modelfile: modelfile, stream: true })
-      });
+    const body: CreateModelRequest = {
+      model: model,
+      modelfile: modelfile
+    };
 
-      if (!initialResponse.ok || !initialResponse.body) {
-        const data = await initialResponse.json();
-        throw new Error(data.error || 'Failed to create the model.');
-      }
-
-      const reader = initialResponse.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-
-      while (true) {
-        const data = await reader.read();
-        const response: CreateModelResponse = JSON.parse(decoder.decode(data.value, { stream: true }));
-
-        setLogs((prevLogs) => [...prevLogs, response.status]);
-        if (response.status === 'success') {
-          break;
-        }
-      }
-
-      setSuccess('Model created successfully.');
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
+    const url = 'http://localhost:11434/api/create';
+    await sendStreamedRequest(url, body, 'create');
+    setLoading(false);
   };
 
   const pullModel = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(null);
-    setError(null);
-    setLogs([]);
 
     const model = pullModelNameRef.current!.value.trim();
 
@@ -120,47 +155,18 @@ export default function ModelModal({ onClose }: ModelModalProps) {
       return;
     }
 
-    try {
-      const initialResponse = await fetch('http://localhost:11434/api/pull', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ model: model, stream: true })
-      });
+    const body: PullModelRequest = {
+      model: model
+    };
 
-      if (!initialResponse.ok || !initialResponse.body) {
-        const data = await initialResponse.json();
-        throw new Error(data.error || 'Failed to pull the model.');
-      }
-
-      const reader = initialResponse.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-
-      while (true) {
-        const data = await reader.read();
-        const response: PullModelResponse = JSON.parse(decoder.decode(data.value, { stream: true }));
-
-        setLogs((prevLogs) => [...prevLogs, response.status]);
-        if (response.status === 'success') {
-          break;
-        }
-      }      
-
-      setSuccess('Model pulled successfully.');
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
+    const url = 'http://localhost:11434/api/pull';
+    await sendStreamedRequest(url, body, 'pull');
+    setLoading(false);
   };
 
   const deleteModel = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(null);
-    setError(null);
-    setLogs([]);
 
     const model = deleteModelNameRef.current!.value.trim();
 
@@ -192,28 +198,15 @@ export default function ModelModal({ onClose }: ModelModalProps) {
   };
 
   const getButtonLabel = () => {
-    if (!loading) {
-      switch (activeTab) {
-        case 'create':
-          return 'Create Model';
-        case 'pull':
-          return 'Pull Model';
-        case 'delete':
-          return 'Delete Model';
-        default:
-          return 'Submit';
-      }
-    }
-
     switch (activeTab) {
       case 'create':
-        return 'Creating...';
+        return (loading ? 'Creating...' : 'Create Model');
       case 'pull':
-        return 'Pulling...';
+        return (loading ? 'Pulling...' : 'Pull Model');
       case 'delete':
-        return 'Deleting...';
+        return (loading ? 'Deleting...' : 'Delete Model');
       default:
-        return 'Submitting...';
+        return (loading ? 'Processing...' : 'Submit');
     }
   };
 

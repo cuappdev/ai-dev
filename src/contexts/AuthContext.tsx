@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await firebaseSignOut(auth);
       setUser(null);
+      setLoading(false);
       setError(null);
       router.push('/');
     } catch (error) {

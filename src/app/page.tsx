@@ -10,7 +10,11 @@ export default function Home() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="h-screen w-screen flex align-middle justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   return (

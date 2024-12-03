@@ -18,7 +18,6 @@ export async function cloneRequest(request: NextRequest, url: string) {
 
     return new NextResponse(clonedResponseBody, { headers, status });
   } catch (error) {
-    console.error("Error in cloneRequest:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse(`Internal Server Error\n${error}`, { status: 500 });
   }
 }

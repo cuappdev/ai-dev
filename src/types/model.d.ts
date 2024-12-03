@@ -74,11 +74,6 @@ export interface ModelInfoResponse {
   // }
 }
 
-export interface CopyModelRequest {
-  source: string;
-  destination: string;
-}
-
 export interface DeleteModelRequest {
   model: string;
 }
@@ -91,9 +86,6 @@ export interface PullModelRequest {
 
 export interface PullModelResponse {
   status: string;
-}
-
-export interface PullModelResponseStream extends PullModelResponse {
   digest?: string;
   total?: number;
   completed?: number;

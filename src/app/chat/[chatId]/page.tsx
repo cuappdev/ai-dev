@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModel } from "@/contexts/ModelContext";
 import { usePathname } from "next/navigation";
+import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from "@/types/chat";
 import Protected from "@/app/components/Protected";
 import ChatHistoryNavbar from "@/app/components/ChatHistoryNavbar";
 import ChatHeader from "../../components/ChatHeader";
 import InputField from "../../components/InputField";
-import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from "@/types/chat";
 import ChatMessage from "../../components/chatMessage";
 
 export default function ChatPage() {
@@ -23,6 +23,8 @@ export default function ChatPage() {
 
   // TODO: Change title of page to summary of the chat on each page
   // TODO: Fix navbar toggle and rerendering
+  // TODO: Fetch the chat from the server and load it into messages, then send a request to get the response if messages.length == 1
+  
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
   }
@@ -53,7 +55,6 @@ export default function ChatPage() {
 
   const sendStreamedMessage = async (message: string) => {
     const body = createChatCompletionRequestBody(message);
-
     try {
       const initialResponse = await fetch(`http://localhost:11434/api/chat`, {
         method: "POST",
@@ -111,8 +112,9 @@ export default function ChatPage() {
         sender: selectedModel
       }
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setMessageStreaming(false);
     }
-    setMessageStreaming(false);
   }
 
   const processSubmit = async (message: string) => {
