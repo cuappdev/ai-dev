@@ -11,7 +11,9 @@ export default function Home() {
   const { user, loading } = useAuth();
   const { selectedModel } = useModel();
 
-  console.log('selectedModel', selectedModel, "env:", process.env.NEXT_PUBLIC_DEFAULT_MODEL);
+  console.log('selectedModel', selectedModel);
+  console.log("env:", process.env.NEXT_PUBLIC_DEFAULT_MODEL);
+  console.log("url", process.env.OLLAMA_ENDPOINT);
 
   if (loading) {
     return (
