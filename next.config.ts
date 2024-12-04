@@ -11,10 +11,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  env: {
-    NEXT_PUBLIC_DEFAULT_MODEL: process.env.NEXT_PUBLIC_DEFAULT_MODEL,
-    OLLAMA_ENDPOINT: process.env.OLLAMA_ENDPOINT,
-  },
 };
 
 export default nextConfig;
