@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { env } from 'next-runtime-env';
 
 interface ModelContextType {
   selectedModel: string;
@@ -18,7 +19,8 @@ export const useModel = () => {
 };
 
 export const ModelProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedModel, setSelectedModel] = useState<string>(process.env.NEXT_PUBLIC_DEFAULT_MODEL!);
+  const defaultModel = env('NEXT_PUBLIC_DEFAULT_MODEL');
+  const [selectedModel, setSelectedModel] = useState<string>(defaultModel!);
 
   return (
     <ModelContext.Provider value={{ selectedModel, setSelectedModel }}>
