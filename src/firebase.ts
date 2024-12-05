@@ -1,15 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { env } from 'next-runtime-env';
 
-// Doesn't need to be private
 const firebaseConfig = {
-  apiKey: "AIzaSyCNf8_FlIH1G7f3lH5ZBQwIKkwi4M5vib4",
-  authDomain: "ai-dev-24263.firebaseapp.com",
-  projectId: "ai-dev-24263",
-  storageBucket: "",
-  messagingSenderId: "591469176148",
-  appId: "1:591469176148:web:f93ba3a2b41fe4bf4cd4c1",
-  measurementId: "G-3D6EFZBVM1"
+  apiKey: env('NEXT_PUBLIC_FIREBASE_API_KEY'),
+  authDomain: env('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN'),
+  projectId: env('NEXT_PUBLIC_FIREBASE_PROJECT_ID'),
+  storageBucket: env('NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: env('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: env('NEXT_PUBLIC_FIREBASE_APP_ID'),
+  measurementId: env('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID')
 };
 
 export const app = initializeApp(firebaseConfig);

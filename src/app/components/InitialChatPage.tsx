@@ -21,6 +21,7 @@ export default function InitialChatPage() {
   const handleSendMessage = (message: string) => {
     // TODO: Add the chat and message to the database
     const chatId = uuidv4();
+    // Delete, needed for linter
     console.log(`Message: ${message}`);
     router.push(`/chat/${chatId}`);
   }
