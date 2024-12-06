@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   authors: [{name: "Aayush Agnihotri", url: "https://www.cornellappdev.com/"}],
   keywords: ["Cornell AppDev", "AI Dev", "AI", "Machine Learning", "Deep Learning", "Artificial Intelligence"],
   icons: {
+    // TODO: Fix favicon on prod
     icon: '/favicon.png',
   },
 };

@@ -126,7 +126,6 @@ export default function ModelModal({ onClose }: ModelModalProps) {
   };
 
   const createModel = async (e: React.FormEvent) => {
-    console.log(e);
     e.preventDefault();
     setLoading(true);
 

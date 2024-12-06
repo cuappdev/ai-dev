@@ -43,30 +43,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      setError(null);
-    } catch (error) {
+    setError(null);
+    await signInWithPopup(auth, provider).catch((error) => {
       setError((error as FirebaseAuthError).message);
-    }
+    });
   };
 
   const signOut = async () => {
-    try {
-      await firebaseSignOut(auth);
-      setUser(null);
-      setLoading(false);
-      setError(null);
+    setError(null);
+    await firebaseSignOut(auth).then(() => {
       router.push('/');
-    } catch (error) {
+    }).catch((error) => {
       setError((error as FirebaseAuthError).message);
-    }
+    });
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      setError(null);
     });
     return () => unsubscribe();
   }, []);
