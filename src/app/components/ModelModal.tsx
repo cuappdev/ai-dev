@@ -143,7 +143,7 @@ export default function ModelModal({ onClose }: ModelModalProps) {
       modelfile: modelfile
     };
 
-    const url = '/api/create';
+    const url = 'api/create';
     await sendStreamedRequest(url, body, 'create');
     setLoading(false);
   };
@@ -164,7 +164,7 @@ export default function ModelModal({ onClose }: ModelModalProps) {
       model: model
     };
 
-    const url = '/api/pull';
+    const url = 'api/pull';
     await sendStreamedRequest(url, body, 'pull');
     setLoading(false);
   };
@@ -182,7 +182,7 @@ export default function ModelModal({ onClose }: ModelModalProps) {
     }
 
     try {
-      const response = await fetch('/api/models', {
+      const response = await fetch('api/models', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'

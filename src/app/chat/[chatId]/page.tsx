@@ -56,7 +56,7 @@ export default function ChatPage() {
   const sendStreamedMessage = async (message: string) => {
     const body = createChatCompletionRequestBody(message);
     try {
-      const initialResponse = await fetch(`/api/models`, {
+      const initialResponse = await fetch(`api/models`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
