@@ -143,7 +143,7 @@ export default function ModelModal({ onClose }: ModelModalProps) {
       modelfile: modelfile
     };
 
-    const url = 'http://localhost:11434/api/create';
+    const url = '/api/create';
     await sendStreamedRequest(url, body, 'create');
     setLoading(false);
   };
@@ -164,7 +164,7 @@ export default function ModelModal({ onClose }: ModelModalProps) {
       model: model
     };
 
-    const url = 'http://localhost:11434/api/pull';
+    const url = '/api/pull';
     await sendStreamedRequest(url, body, 'pull');
     setLoading(false);
   };
