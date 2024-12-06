@@ -14,11 +14,11 @@ export default function ChatHeader() {
   const [activeModels, setActiveModels] = useState<string[]>([]);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
 
-  const openModelDropdown = () => {
+  const openModelDropdown = async () => {
     setLoading(true);
-    fetchAllModels();
-    fetchActiveModels();
-    setModelDropdownOpen(!modelDropdownOpen);
+    await fetchAllModels();
+    await fetchActiveModels();
+    setModelDropdownOpen(true);
     setLoading(false);
   }
 

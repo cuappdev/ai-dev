@@ -16,9 +16,9 @@ export async function cloneRequest(request: NextRequest, url: string) {
   try {
     const clonedResponse = await fetch(`${process.env.OLLAMA_ENDPOINT}${url}`, init);
 
-    if (!clonedResponse.ok || !clonedResponse.body) {
-      return NextResponse.json({ error: `Ollama API error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
-    }
+    // if (!clonedResponse.ok || !clonedResponse.body) {
+    //   return NextResponse.json({ error: `Ollama API error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
+    // }
 
     const headers = new Headers(clonedResponse.headers);
     const contentType = clonedResponse.headers.get('Content-Type');
