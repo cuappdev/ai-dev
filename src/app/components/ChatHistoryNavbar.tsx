@@ -6,6 +6,7 @@ import Image from "next/image";
 import Spinner from "./Spinner";
 import ChatHistory from "./ChatHistory";
 import ModelModal from "./ModelModal";
+import Modal from "./Modal";
 
 // TODO: Make this component responsive
 // TODO: Fix rerenders on every page load
@@ -104,8 +105,10 @@ export default function ChatHistoryNavbar({ toggleNavbar, isNavbarOpen }: ChatHi
       )}
 
       {isModelModalOpen && (
-        <ModelModal onClose={() => setIsModelModalOpen(false)} />
-      )};
+        <Modal onClose={() => setIsModelModalOpen(false)}>
+          <ModelModal />
+        </Modal>
+      )}
     </div>
   )
 }
