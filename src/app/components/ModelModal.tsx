@@ -35,8 +35,6 @@ export default function ModelModal() {
   }
 
   const sendStreamedRequest = async (body: CreateModelRequest | PullModelRequest, option: TabOption) => {
-    if (loading) return;
-    
     setSuccess(null);
     setError(null);
     setLogs([]);
@@ -156,7 +154,6 @@ export default function ModelModal() {
 
   const deleteModel = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading) return;
     setLoading(true);
     setSuccess(null);
     setError(null);
@@ -183,6 +180,7 @@ export default function ModelModal() {
         const data = await response.json();
         throw new Error(data.error || 'Failed to delete the model.');
       }
+      
       setSuccess('Operation successful');
     } catch (error: unknown) {
       if (error instanceof Error) {

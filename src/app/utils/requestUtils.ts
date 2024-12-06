@@ -11,6 +11,7 @@ async function createClonedRequest(request: NextRequest) {
 }
 
 export async function cloneRequest(request: NextRequest, url: string) {
+  console.log(`${process.env.OLLAMA_ENDPOINT}${url}`);
   const init: RequestInit = await createClonedRequest(request);
 
   try {
@@ -33,7 +34,7 @@ export async function cloneRequest(request: NextRequest, url: string) {
       headers.set('Transfer-Encoding', transferEncoding);
     }
 
-    return new NextResponse(clonedResponse.body, { headers });
+    return new NextResponse(clonedResponse.body, { headers, status: clonedResponse.status });
   } catch (error) {
     console.log('Error:', error);
     return NextResponse.json({ error: error }, { status: 500 });
