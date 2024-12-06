@@ -37,6 +37,9 @@ export async function cloneRequest(request: NextRequest, url: string) {
     return new NextResponse(clonedResponse.body, { headers, status: clonedResponse.status });
   } catch (error) {
     console.log('Error:', error);
+    console.log((error as Error).message)
+    console.log((error as Error).name)
+    console.log((error as Error).cause)
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }
