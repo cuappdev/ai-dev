@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Providers from './Providers';
 import type { Metadata } from 'next';
 import { PublicEnvScript } from 'next-runtime-env';
@@ -19,7 +20,6 @@ export const metadata: Metadata = {
     'Artificial Intelligence',
   ],
   icons: {
-    // TODO: Fix favicon on prod
     icon: '/favicon.png',
   },
 };
@@ -29,9 +29,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <head>
+      <Head>
         <PublicEnvScript />
-      </head>
+        <link rel="icon" href="/favicon.png" />
+      </Head>
       <body>
         <Providers>{children}</Providers>
       </body>
