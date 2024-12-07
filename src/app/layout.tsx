@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import Providers from './Providers';
 import type { Metadata } from 'next';
 import { PublicEnvScript } from 'next-runtime-env';
@@ -29,10 +28,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <Head>
+      <head>
         <PublicEnvScript />
-        <link rel="icon" href="/favicon.png" />
-      </Head>
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
