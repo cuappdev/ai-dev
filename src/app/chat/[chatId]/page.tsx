@@ -9,12 +9,12 @@ import Protected from "@/app/components/Protected";
 import ChatHistoryNavbar from "@/app/components/ChatHistoryNavbar";
 import ChatHeader from "../../components/ChatHeader";
 import InputField from "../../components/InputField";
-import ChatMessage from "../../components/chatMessage";
+import ChatMessage from "../../components/ChatMessage";
 
 export default function ChatPage() {
   const { user } = useAuth();
   const { selectedModel } = useModel();
-  const [isNavbarOpen, setIsNavbarOpen] = useState(true);
+  const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageStreaming, setMessageStreaming] = useState(false);
   const pathname = usePathname();
@@ -134,11 +134,7 @@ export default function ChatPage() {
   return (
     <Protected>
       <div className="flex flex-row gap-0 w-full h-screen">
-        <div
-          className={`h-full bg-black transition-all duration-300 ${
-            isNavbarOpen ? 'w-2/12' : 'w-0'
-          } flex-shrink-0`}
-        >
+        <div className={`bg-black transition-all duration-300 flex-shrink-0 overflow-y-auto ${isNavbarOpen ? 'w-64' : 'w-0'}`}>
           <ChatHistoryNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
         </div>
 

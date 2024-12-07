@@ -6,23 +6,8 @@ import Spinner from "./Spinner";
 export default function ModelInfoModal() {
   const { selectedModel } = useModel();
   const [modelData, setModelData] = useState<ModelInfoResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [flattened, setFlattened] = useState<Record<string, string>>({});
-
-  const flattenJSON = (json: Record<string, string>, parentKey = '') => {
-    const flattened: Record<string, string> = {};
-    for (const key in json) {
-      if (json.hasOwnProperty(key)) {
-        const newKey = parentKey ? `${parentKey}.${key}` : key;
-        if (typeof json[key] === 'object' && json[key] !== null) {
-          Object.assign(flattened, flattenJSON(json[key], newKey));
-        } else {
-          flattened[newKey] = json[key];
-        }
-      }
-    }
-    return flattened;
-  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,17 +19,36 @@ export default function ModelInfoModal() {
         body: JSON.stringify({ model: selectedModel })
       })
         .then(res => res.json())
-        .then(data => {
-          console.log(data);
+        .then((data: ModelInfoResponse) => {
           setModelData(data);
           setLoading(false);
-          setFlattened(flattenJSON(data));
       }).catch((error) => {
-        console.error(error);
+        setError((error as Error).message);
       })
     }
     fetchData();
   }, []);
+
+  const printModelData = (modelData: ModelInfoResponse): (JSX.Element | string)[] => {
+    if (!modelData) {
+      return [];
+    }
+    return Object.entries(modelData).flatMap(([key, value]) => {
+      if (typeof value === 'object') {
+        return (
+          <div key={key}>
+            <span className="font-semibold">{key}</span>: {printModelData(value)}
+          </div>
+        );
+      } else {
+        return (
+          <div key={key}>
+            <span className="font-semibold">{key}</span>: {value}
+          </div>
+        );
+      }
+    });
+  }
 
   if (loading) {
     return (
@@ -52,14 +56,14 @@ export default function ModelInfoModal() {
     )
   }
 
-
   return (
     <>
-      <h1>Modal</h1>
+      <span className="font-semibold text-3xl">{selectedModel} Info</span>
       {modelData ? <h2>{modelData.model}</h2> : <h2>No model data</h2>}
-      <pre>
-        {JSON.stringify(flattened, null, 2)}
+      <pre className="max-h-72 overflow-y-auto mt-2">
+        {modelData && printModelData(modelData)}
       </pre>
+      {error && <span className="text-red-500">{error}</span>}
     </>
   );
 }

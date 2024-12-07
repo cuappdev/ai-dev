@@ -15,9 +15,21 @@ export default function ChatHeader() {
   const modelDropdownRef = useRef<HTMLDivElement>(null);
 
   const openModelDropdown = async () => {
+    if (modelDropdownOpen) return;
     setLoading(true);
-    await fetchAllModels();
-    await fetchActiveModels();
+    await Promise.all([fetchAllModels(), fetchActiveModels()])
+    .catch(error => {
+      console.error(error);
+      setAvailableModels({ models: [{ 
+        name: "Unable to load models",
+        modified_at: "",
+        size: 0,
+        digest: "",
+        details: { format: "", family: "", families: null, parameter_size: "", quantization_level: "" },
+        expires_at: "",
+        size_vram: 0
+      }] 
+    })});
     setModelDropdownOpen(true);
     setLoading(false);
   }
@@ -31,7 +43,6 @@ export default function ChatHeader() {
     await fetch("/api/models/all")
     .then(response => response.json())
     .then((data: AllModelsResponse) => setAvailableModels(data))
-    .catch(error => console.error(error));
   }
 
   const fetchActiveModels = async () => {
@@ -40,14 +51,10 @@ export default function ChatHeader() {
     .then((data: AllModelsResponse) => {
       setActiveModels(data.models.map(model => model.name));
     })
-    .catch(error => console.error(error));
   }
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      modelDropdownRef.current &&
-      !modelDropdownRef.current.contains(event.target as Node)
-    ) {
+    if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
       setModelDropdownOpen(false);
     }
   };
@@ -63,8 +70,8 @@ export default function ChatHeader() {
     <div className="flex flex-row pt-3 justify-end items-center w-11/12 m-auto">
       <div className="relative" ref={modelDropdownRef}>
         <div className="flex flex-row items-center">
-          <div className={`size-6 ${loading ? "block" : "hidden"}`}>
-            <Spinner />
+          <div className={`${loading ? "flex items-center" : "hidden"} mr-2`}>
+            <Spinner width="6" height="6" />
           </div>
           
           <button onClick={() => setIsModelInfoModalOpen(true)}>
@@ -82,7 +89,7 @@ export default function ChatHeader() {
         </div>
         {modelDropdownOpen && (
           <div className="absolute top-full right-0 w-40 rounded-md shadow-lg z-10 bg-gray-100">
-            {availableModels.models.map((model, index) => (
+            {availableModels && availableModels.models.map((model, index) => (
               <button
                 key={index}
                 onClick={() => selectModel(model.name)}
@@ -90,7 +97,7 @@ export default function ChatHeader() {
                 {activeModels.includes(model.name)  && (
                   <div className="mr-2 h-2 w-2 bg-green-500 rounded-full"></div>
                 )}
-                <span className="flex-1 truncate">{model.name}</span>
+                <span className={`flex-1 truncate ${selectedModel === model.name ? "font-semibold" : ""}`}>{model.name}</span>
               </button>
             ))}
           </div>

@@ -8,8 +8,7 @@ import ChatHistory from "./ChatHistory";
 import ModelModal from "./ModelModal";
 import Modal from "./Modal";
 
-// TODO: Make this component responsive
-// TODO: Fix rerenders on every page load
+// TODO: Fix page extending beyond the viewport
 // TODO: Fetch chat history from the server
 
 interface ChatHistoryNavbarProps {

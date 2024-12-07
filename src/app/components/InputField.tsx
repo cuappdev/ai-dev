@@ -53,12 +53,13 @@ export default function InputField({ onSubmit, messageStreaming }: InputFieldPro
       </button> */}
 
       <textarea
+        autoFocus
         ref={textareaRef}
         value={message}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder={`Message ${selectedModel}`}
-        className="flex-1 max-h-[150px] border-none outline-none text-gray-700 placeholder-gray-400 resize-none"
+        className="flex-1 max-h-[150px] overflow-hidden border-none outline-none text-gray-700 placeholder-gray-400 resize-none"
         rows={1}
       />
 

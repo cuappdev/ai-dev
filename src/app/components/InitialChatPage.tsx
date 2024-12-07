@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function InitialChatPage() {
   const { user } = useAuth();
-  const [isNavbarOpen, setIsNavbarOpen] = useState(true);
+  const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
   const firstName = user!.displayName?.split(" ")[0];
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function InitialChatPage() {
     setIsNavbarOpen(!isNavbarOpen);
   }
 
-  const handleSendMessage = (message: string) => {
+  const handleInitialSendMessage = (message: string) => {
     // TODO: Add the chat and message to the database
     const chatId = uuidv4();
     // Delete, needed for linter
@@ -27,12 +27,8 @@ export default function InitialChatPage() {
   }
 
   return (
-    <div className="flex flex-row gap-0 w-full h-screen">
-      <div
-        className={`h-full bg-black transition-all duration-300 ${
-          isNavbarOpen ? 'w-2/12' : 'w-0'
-        } flex-shrink-0`}
-      >
+    <div className="flex flex-row gap-0 h-screen">
+      <div className={`bg-black transition-all duration-300 overscroll-none flex-shrink-0 ${isNavbarOpen ? 'w-64' : 'w-0'}`}>
         <ChatHistoryNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
       </div>
 
@@ -53,7 +49,7 @@ export default function InitialChatPage() {
         </div>
 
         <div className="mb-10">
-          <InputField messageStreaming={false} onSubmit={handleSendMessage} />
+          <InputField messageStreaming={false} onSubmit={handleInitialSendMessage} />
         </div>
       </div>
     </div>
