@@ -1,7 +1,19 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, User } from 'firebase/auth';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 
@@ -51,11 +63,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     setError(null);
-    await firebaseSignOut(auth).then(() => {
-      router.push('/');
-    }).catch((error) => {
-      setError((error as FirebaseAuthError).message);
-    });
+    await firebaseSignOut(auth)
+      .then(() => {
+        router.push('/');
+      })
+      .catch((error) => {
+        setError((error as FirebaseAuthError).message);
+      });
   };
 
   useEffect(() => {
@@ -68,7 +82,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, signInWithGoogle, signOut }}>
+    <AuthContext.Provider
+      value={{ user, loading, error, signInWithGoogle, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

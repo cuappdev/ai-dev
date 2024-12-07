@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useModel } from "@/contexts/ModelContext";
-import { ModelInfoResponse } from "@/types/model";
-import Spinner from "./Spinner";
+import { useEffect, useState } from 'react';
+import { useModel } from '@/contexts/ModelContext';
+import { ModelInfoResponse } from '@/types/model';
+import Spinner from './Spinner';
 
 export default function ModelInfoModal() {
   const { selectedModel } = useModel();
@@ -14,22 +14,25 @@ export default function ModelInfoModal() {
       await fetch(`/api/models/show`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ model: selectedModel })
+        body: JSON.stringify({ model: selectedModel }),
       })
-        .then(res => res.json())
+        .then((res) => res.json())
         .then((data: ModelInfoResponse) => {
           setModelData(data);
           setLoading(false);
-      }).catch((error) => {
-        setError((error as Error).message);
-      })
-    }
+        })
+        .catch((error) => {
+          setError((error as Error).message);
+        });
+    };
     fetchData();
   }, []);
 
-  const printModelData = (modelData: ModelInfoResponse): (JSX.Element | string)[] => {
+  const printModelData = (
+    modelData: ModelInfoResponse
+  ): (JSX.Element | string)[] => {
     if (!modelData) {
       return [];
     }
@@ -37,7 +40,8 @@ export default function ModelInfoModal() {
       if (typeof value === 'object') {
         return (
           <div key={key}>
-            <span className="font-semibold">{key}</span>: {printModelData(value)}
+            <span className="font-semibold">{key}</span>:{' '}
+            {printModelData(value)}
           </div>
         );
       } else {
@@ -48,12 +52,10 @@ export default function ModelInfoModal() {
         );
       }
     });
-  }
+  };
 
   if (loading) {
-    return (
-      <Spinner />
-    )
+    return <Spinner />;
   }
 
   return (

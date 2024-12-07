@@ -1,8 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { AuthProvider } from '../contexts/AuthContext';
-import { ModelProvider } from '../contexts/ModelContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ModelProvider } from '@/contexts/ModelContext';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -11,9 +11,7 @@ interface ProvidersProps {
 const Providers = ({ children }: ProvidersProps) => {
   return (
     <AuthProvider>
-      <ModelProvider>
-        {children}
-      </ModelProvider>
+      <ModelProvider>{children}</ModelProvider>
     </AuthProvider>
   );
 };

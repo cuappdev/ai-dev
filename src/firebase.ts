@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { env } from 'next-runtime-env';
 
 const firebaseConfig = {
@@ -9,8 +9,8 @@ const firebaseConfig = {
   storageBucket: env('NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'),
   messagingSenderId: env('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'),
   appId: env('NEXT_PUBLIC_FIREBASE_APP_ID'),
-  measurementId: env('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID')
+  measurementId: env('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID'),
 };
 
 export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app)
+export const auth = getAuth(app);

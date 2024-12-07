@@ -50,27 +50,27 @@ export interface ModelInfoResponse {
     quantization_level: string;
   };
   // model_info: {
-    // general.architecture: string;
-    // general.file_type: number;
-    // general.parameter_count: number;
-    // general.quantization_version: number;
-    // llama.attention.head_count: number;
-    // llama.attention.head_count_kv: number;
-    // llama.attention.layer_norm_rms_epsilon: number;
-    // llama.block_count: number;
-    // llama.context_length: number;
-    // llama.embedding_length: number;
-    // llama.feed_forward_length: number;
-    // llama.rope.dimension_count: number;
-    // llama.rope.freq_base: number;
-    // llama.vocab_size: number;
-    // tokenizer.ggml.bos_token_id: number
-    // tokenizer.ggml.eos_token_id: number
-    // tokenizer.ggml.merges?: string[];
-    // tokenizer.ggml.model: string;
-    // tokenizer.ggml.pre: string;
-    // tokenizer.ggml.token_type?: string[];
-    // tokenizer.ggml.tokens?: string[];
+  // general.architecture: string;
+  // general.file_type: number;
+  // general.parameter_count: number;
+  // general.quantization_version: number;
+  // llama.attention.head_count: number;
+  // llama.attention.head_count_kv: number;
+  // llama.attention.layer_norm_rms_epsilon: number;
+  // llama.block_count: number;
+  // llama.context_length: number;
+  // llama.embedding_length: number;
+  // llama.feed_forward_length: number;
+  // llama.rope.dimension_count: number;
+  // llama.rope.freq_base: number;
+  // llama.vocab_size: number;
+  // tokenizer.ggml.bos_token_id: number
+  // tokenizer.ggml.eos_token_id: number
+  // tokenizer.ggml.merges?: string[];
+  // tokenizer.ggml.model: string;
+  // tokenizer.ggml.pre: string;
+  // tokenizer.ggml.token_type?: string[];
+  // tokenizer.ggml.tokens?: string[];
   // }
 }
 

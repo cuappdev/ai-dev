@@ -1,4 +1,9 @@
-import { CreateModelRequest, CreateModelResponse, PullModelRequest, PullModelResponse } from '@/types/model';
+import {
+  CreateModelRequest,
+  CreateModelResponse,
+  PullModelRequest,
+  PullModelResponse,
+} from '@/types/model';
 import { useState, useRef } from 'react';
 
 type TabOption = 'create' | 'pull' | 'delete';
@@ -11,7 +16,7 @@ interface TabOptionConfig {
 const tabOptions: TabOptionConfig[] = [
   { value: 'create', label: 'Create Model' },
   { value: 'pull', label: 'Pull Model' },
-  { value: 'delete', label: 'Delete Model' }
+  { value: 'delete', label: 'Delete Model' },
 ];
 
 export default function ModelModal() {
@@ -32,9 +37,12 @@ export default function ModelModal() {
     setSuccess(null);
     setError(null);
     setLogs([]);
-  }
+  };
 
-  const sendStreamedRequest = async (body: CreateModelRequest | PullModelRequest, option: TabOption) => {
+  const sendStreamedRequest = async (
+    body: CreateModelRequest | PullModelRequest,
+    option: TabOption
+  ) => {
     setSuccess(null);
     setError(null);
     setLogs([]);
@@ -42,9 +50,9 @@ export default function ModelModal() {
       const initialResponse = await fetch(`/api/models/${activeTab}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
       if (!initialResponse.ok || !initialResponse.body) {
@@ -68,7 +76,8 @@ export default function ModelModal() {
         for (const line of lines) {
           if (line.trim()) {
             try {
-              const response: CreateModelResponse | PullModelResponse = JSON.parse(line);
+              const response: CreateModelResponse | PullModelResponse =
+                JSON.parse(line);
               setLogs((prevLogs) => [...prevLogs, response.status]);
 
               if (response.status === 'success') {
@@ -76,7 +85,6 @@ export default function ModelModal() {
                 done = true;
                 break;
               }
-              
             } catch (parseError: unknown) {
               if (parseError instanceof Error) {
                 setError(parseError.message);
@@ -86,11 +94,12 @@ export default function ModelModal() {
           }
         }
       }
-      
+
       // Remaining data in the buffer
       if (buffer.trim()) {
         try {
-          const response: CreateModelResponse | PullModelResponse = JSON.parse(buffer);
+          const response: CreateModelResponse | PullModelResponse =
+            JSON.parse(buffer);
           setLogs((prevLogs) => [...prevLogs, response.status]);
 
           if (response.status === 'success') {
@@ -102,7 +111,6 @@ export default function ModelModal() {
           }
         }
       }
-
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
@@ -125,7 +133,7 @@ export default function ModelModal() {
 
     const body: CreateModelRequest = {
       model: model,
-      modelfile: modelfile
+      modelfile: modelfile,
     };
 
     await sendStreamedRequest(body, 'create');
@@ -145,7 +153,7 @@ export default function ModelModal() {
     }
 
     const body: PullModelRequest = {
-      model: model
+      model: model,
     };
 
     await sendStreamedRequest(body, 'pull');
@@ -171,16 +179,16 @@ export default function ModelModal() {
       const response = await fetch('/api/models', {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ model: model })
+        body: JSON.stringify({ model: model }),
       });
 
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Failed to delete the model.');
       }
-      
+
       setSuccess('Operation successful');
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -194,13 +202,13 @@ export default function ModelModal() {
   const getButtonLabel = () => {
     switch (activeTab) {
       case 'create':
-        return (loading ? 'Creating...' : 'Create Model');
+        return loading ? 'Creating...' : 'Create Model';
       case 'pull':
-        return (loading ? 'Pulling...' : 'Pull Model');
+        return loading ? 'Pulling...' : 'Pull Model';
       case 'delete':
-        return (loading ? 'Deleting...' : 'Delete Model');
+        return loading ? 'Deleting...' : 'Delete Model';
       default:
-        return (loading ? 'Processing...' : 'Submit');
+        return loading ? 'Processing...' : 'Submit';
     }
   };
 
@@ -230,9 +238,7 @@ export default function ModelModal() {
             <h2 className="text-xl font-semibold mb-2">Create a New Model</h2>
             <form onSubmit={createModel}>
               <div className="mb-4">
-                <label className="block mb-2">
-                  Model Name
-                </label>
+                <label className="block mb-2">Model Name</label>
                 <input
                   type="text"
                   ref={createModelNameRef}
@@ -241,9 +247,7 @@ export default function ModelModal() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block mb-2">
-                  Modelfile
-                </label>
+                <label className="block mb-2">Modelfile</label>
                 <textarea
                   ref={createModelfileRef}
                   required
@@ -265,9 +269,7 @@ export default function ModelModal() {
             <h2 className="text-xl font-semibold mb-2">Pull Model</h2>
             <form onSubmit={pullModel}>
               <div className="mb-4">
-                <label className="block mb-2">
-                  Model Name
-                </label>
+                <label className="block mb-2">Model Name</label>
                 <input
                   type="text"
                   ref={pullModelNameRef}
@@ -290,9 +292,7 @@ export default function ModelModal() {
             <h2 className="text-xl font-semibold mb-2">Delete Model</h2>
             <form onSubmit={deleteModel}>
               <div className="mb-4">
-                <label className="block mb-2">
-                  Model Name
-                </label>
+                <label className="block mb-2">Model Name</label>
                 <input
                   type="text"
                   ref={deleteModelNameRef}
@@ -312,13 +312,13 @@ export default function ModelModal() {
 
         {logs.length > 0 && (
           <div className="mt-4 bg-black text-white font-mono p-4 rounded-md overflow-y-auto max-h-60">
-          <h3 className="text-lg font-semibold mb-2">Logs</h3>
-          <ul className="list-none space-y-1">
-            {logs.map((log, index) => (
-              <li key={index}>{log}</li>
-            ))}
-          </ul>
-        </div>
+            <h3 className="text-lg font-semibold mb-2">Logs</h3>
+            <ul className="list-none space-y-1">
+              {logs.map((log, index) => (
+                <li key={index}>{log}</li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {success && (
@@ -335,4 +335,4 @@ export default function ModelModal() {
       </div>
     </>
   );
-};
+}

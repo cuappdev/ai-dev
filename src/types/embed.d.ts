@@ -17,7 +17,7 @@ export interface EmbedRequest {
     top_k: number;
     top_p: number;
     min_p: number;
-  }
+  };
   keep_alive?: number;
 }
 
