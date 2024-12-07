@@ -7,9 +7,9 @@ import { usePathname } from "next/navigation";
 import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from "@/types/chat";
 import Protected from "@/app/components/Protected";
 import ChatHistoryNavbar from "@/app/components/ChatHistoryNavbar";
-import ChatHeader from "../../components/ChatHeader";
-import InputField from "../../components/InputField";
-import ChatMessage from "../../components/ChatMessage";
+import ChatHeader from "@/app/components/ChatHeader";
+import InputField from "@/app/components/InputField";
+import ChatMessage from "@/app/components/ChatMessage";
 
 export default function ChatPage() {
   const { user } = useAuth();
