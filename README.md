@@ -36,3 +36,49 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 curl -X POST "http://0.0.0.0:11434/api/pull" -d '{"model":"llama3.2:1b"}'
+curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "prompt":"hello"}'
+
+docker exec -it e345672ce6b2 curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "prompt":"hello"}'
+
+thestack_app-network
+
+Pull Model - ollama
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X POST "http://ollama:11434/api/pull" \
+ -d '{"model":"llama3.2:1b"}'
+
+Get active models - ollama
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X GET "http://ollama:11434/api/ps"
+
+Get all models - ollama
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X GET "http://ollama:11434/api/tags"
+
+Generate - ollama
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X POST "http://ollama:11434/api/generate" \
+ -d '{"model":"llama3.2:1b", "prompt":"hello"}'
+
+Chat - ollama
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X POST "http://ollama:11434/api/chat" \
+ -d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Why is the sky blue"}]}'
+
+Get all models - app
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X GET "http://ai-dev-app:3000/api/models/all"
+
+Get active models - app
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X GET "http://ai-dev-app:3000/api/models/active"
+
+Chat - app
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X POST "http://ai-dev-app:3000/api/chat" \
+ -d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}'
+
+Chat Models - app
+docker run --rm --network thestack_app-network curlimages/curl \
+ -X POST "http://ai-dev-app:3000/api/models" \
+ -d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}'
