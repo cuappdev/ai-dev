@@ -15,6 +15,7 @@ async function createClonedRequest(request: NextRequest) {
 
 export async function cloneRequest(request: NextRequest, url: string) {
   console.log(`${process.env.OLLAMA_ENDPOINT}${url}`);
+  console.log("blah")
   const init: RequestInit = await createClonedRequest(request);
 
   try {
