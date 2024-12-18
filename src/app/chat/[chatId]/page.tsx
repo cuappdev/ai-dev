@@ -69,6 +69,12 @@ export default function ChatPage() {
         },
         body: JSON.stringify(body),
       });
+
+      if (!initialResponse) {
+        console.log("no response");
+        console.log(initialResponse);
+        throw new Error('Failed to send message.');
+      }
       console.log("fetched from backend");
 
       if (!initialResponse.ok || !initialResponse.body) {
