@@ -38,6 +38,23 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 curl -X POST "http://0.0.0.0:11434/api/pull" -d '{"model":"llama3.2:1b"}'
 curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "prompt":"hello"}'
 
+curl -H "Origin: https://ai.cornellappdev.com" \
+ -H "Access-Control-Request-Method: POST" \
+ -H "Access-Control-Request-Headers: X-Requested-With" \
+ -X OPTIONS --verbose \
+ https://ai.cornellappdev.com/api/models
+
+curl -X POST "https://ai.cornellappdev.com/api/models" \
+-H "Content-Type: application/json" \
+-d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}' \
+--verbose
+
+curl -X POST "https://ai.cornellappdev.com/api/models" \
+-H "Content-Type: application/json" \
+-H "Origin: https://ai.cornellappdev.com" \
+-d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}' \
+--verbose
+
 docker exec -it e345672ce6b2 curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "prompt":"hello"}'
 
 thestack_app-network

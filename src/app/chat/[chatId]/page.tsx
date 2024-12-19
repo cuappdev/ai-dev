@@ -61,7 +61,6 @@ export default function ChatPage() {
   const sendStreamedMessage = async (message: string) => {
     const body = createChatCompletionRequestBody(message);
     try {
-      console.log("Prefetch");
       const initialResponse = await fetch(`/api/models`, {
         method: 'POST',
         headers: {
@@ -71,22 +70,13 @@ export default function ChatPage() {
       });
 
       if (!initialResponse) {
-        console.log("no response");
-        console.log(initialResponse);
         throw new Error('Failed to send message.');
       }
-      console.log("fetched from backend");
 
       if (!initialResponse.ok || !initialResponse.body) {
         const data = await initialResponse.json();
-        if (!initialResponse.ok) {
-          console.log("not ok");
-        } else {
-          console.log("no body");
-        }
         throw new Error(data.error || 'Failed to send message.');
       }
-      console.log("decoding");
 
       const reader = initialResponse.body.getReader();
       const decoder = new TextDecoder('utf-8');

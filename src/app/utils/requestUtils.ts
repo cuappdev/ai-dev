@@ -14,19 +14,20 @@ async function createClonedRequest(request: NextRequest) {
 }
 
 export async function cloneRequest(request: NextRequest, url: string) {
-  console.log(`${process.env.OLLAMA_ENDPOINT}${url}`);
-  console.log("blah")
+  console.log(`Hitting ${process.env.OLLAMA_ENDPOINT}${url} with inital request:`, request);
   const init: RequestInit = await createClonedRequest(request);
 
   try {
+    console.log('Cloning request with init:', init);
     const clonedResponse = await fetch(
       `${process.env.OLLAMA_ENDPOINT}${url}`,
       init
     );
+    console.log('Cloned response:', clonedResponse);
 
-    // if (!clonedResponse.ok || !clonedResponse.body) {
-    //   return NextResponse.json({ error: `Ollama API error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
-    // }
+    if (!clonedResponse.ok || !clonedResponse.body) {
+      return NextResponse.json({ error: `Ollama API error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
+    }
 
     const headers = new Headers(clonedResponse.headers);
     const contentType = clonedResponse.headers.get('Content-Type');
