@@ -7,7 +7,7 @@ async function createClonedRequest(request: NextRequest) {
     headers: (() => {
       const headers = new Headers();
       request.headers.forEach((value, key) => {
-        if (['authorization', 'origin', 'referer'].includes(key.toLowerCase())) {
+        if (['authorization', 'origin', 'referer', 'host'].includes(key.toLowerCase())) {
           return;
         }
         headers.append(key, value);
@@ -61,10 +61,6 @@ export async function cloneRequest(request: NextRequest, url: string) {
       status: clonedResponse.status,
     });
   } catch (error) {
-    console.log('Error:', error);
-    console.log((error as Error).message);
-    console.log((error as Error).name);
-    console.log((error as Error).cause);
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }
