@@ -4,7 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 async function createClonedRequest(request: NextRequest) {
   const init: RequestInit = {
     method: request.method,
-    headers: request.headers,
+    headers: (() => {
+      const headers = new Headers();
+      request.headers.forEach((value, key) => {
+        if (['authorization', 'origin', 'referer'].includes(key.toLowerCase())) {
+          return;
+        }
+        headers.append(key, value);
+      });
+      return headers;
+    })(),
     body:
       request.method !== 'GET' && request.method !== 'HEAD'
         ? await request.clone().text()
@@ -18,12 +27,17 @@ export async function cloneRequest(request: NextRequest, url: string) {
   const init: RequestInit = await createClonedRequest(request);
 
   try {
-    console.log('Cloning request with init:', init);
+    console.log('Cloned request method:', init.method);
+    console.log('Cloned request headers:', init.headers);
+    console.log('Cloned request body:', init.body);
     const clonedResponse = await fetch(
       `${process.env.OLLAMA_ENDPOINT}${url}`,
       init
     );
-    console.log('Cloned response:', clonedResponse);
+    console.log('Cloned response headers:', clonedResponse.headers);
+    console.log('Cloned response status:', clonedResponse.status);
+    console.log('Cloned response status text:', clonedResponse.statusText);
+    console.log('Cloned response body:', clonedResponse.body);
 
     if (!clonedResponse.ok || !clonedResponse.body) {
       return NextResponse.json({ error: `Ollama API error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });

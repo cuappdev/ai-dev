@@ -35,6 +35,8 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+'https://0.0.0.0:3000'
+
 curl -X POST "http://0.0.0.0:11434/api/pull" -d '{"model":"llama3.2:1b"}'
 curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "prompt":"hello"}'
 
