@@ -1,5 +1,3 @@
-'use client';
-
 import {
   createContext,
   useContext,
@@ -54,8 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
     setError(null);
+    const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider).catch((error) => {
       setError((error as FirebaseAuthError).message);
     });

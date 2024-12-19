@@ -1,10 +1,17 @@
 import {
   CreateModelRequest,
   CreateModelResponse,
+  DeleteModelRequest,
   PullModelRequest,
   PullModelResponse,
 } from '@/types/model';
 import { useState, useRef } from 'react';
+import Spinner from './Spinner';
+
+interface ModelModalProps {
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 type TabOption = 'create' | 'pull' | 'delete';
 
@@ -19,11 +26,10 @@ const tabOptions: TabOptionConfig[] = [
   { value: 'delete', label: 'Delete Model' },
 ];
 
-export default function ModelModal() {
+export default function ModelModal({ loading, setLoading }: ModelModalProps) {
   const [activeTab, setActiveTab] = useState<TabOption>('create');
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
 
   const createModelNameRef = useRef<HTMLInputElement>(null);
@@ -31,33 +37,37 @@ export default function ModelModal() {
   const pullModelNameRef = useRef<HTMLInputElement>(null);
   const deleteModelNameRef = useRef<HTMLInputElement>(null);
 
-  const handleTabChange = (tab: TabOption) => {
-    setActiveTab(tab);
-    setLoading(false);
+  const clearValues = () => {
     setSuccess(null);
     setError(null);
     setLogs([]);
+  }
+
+  const handleTabChange = (tab: TabOption) => {
+    if (loading) return;
+    setActiveTab(tab);
+    clearValues();
   };
 
+  // TODO: Fix stream request
   const sendStreamedRequest = async (
     body: CreateModelRequest | PullModelRequest,
-    option: TabOption
   ) => {
-    setSuccess(null);
-    setError(null);
-    setLogs([]);
+    setLoading(true);
+    clearValues();
     try {
       const initialResponse = await fetch(`/api/models/${activeTab}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // TODO: Add Authorization header with token
         },
         body: JSON.stringify(body),
       });
 
       if (!initialResponse.ok || !initialResponse.body) {
         const data = await initialResponse.json();
-        throw new Error(data.error || `Failed to ${option} the model.`);
+        throw new Error(data.error || `Failed to ${activeTab} the model.`);
       }
 
       const reader = initialResponse.body.getReader();
@@ -81,7 +91,7 @@ export default function ModelModal() {
               setLogs((prevLogs) => [...prevLogs, response.status]);
 
               if (response.status === 'success') {
-                setSuccess('Operation successful');
+                setSuccess(getSuccessMessage());
                 done = true;
                 break;
               }
@@ -103,7 +113,7 @@ export default function ModelModal() {
           setLogs((prevLogs) => [...prevLogs, response.status]);
 
           if (response.status === 'success') {
-            setSuccess('Operation successful');
+            setSuccess(getSuccessMessage());
           }
         } catch (parseError: unknown) {
           if (parseError instanceof Error) {
@@ -115,73 +125,22 @@ export default function ModelModal() {
       if (error instanceof Error) {
         setError(error.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const createModel = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendDeleteRequest = async (body: DeleteModelRequest) => {
     setLoading(true);
-
-    const model = createModelNameRef.current!.value.trim();
-    const modelfile = createModelfileRef.current!.value.trim();
-
-    if (!model || !modelfile) {
-      setError('Please fill in all fields.');
-      setLoading(false);
-      return;
-    }
-
-    const body: CreateModelRequest = {
-      model: model,
-      modelfile: modelfile,
-    };
-
-    await sendStreamedRequest(body, 'create');
-    setLoading(false);
-  };
-
-  const pullModel = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const model = pullModelNameRef.current!.value.trim();
-
-    if (!model) {
-      setError('Please fill in all fields.');
-      setLoading(false);
-      return;
-    }
-
-    const body: PullModelRequest = {
-      model: model,
-    };
-
-    await sendStreamedRequest(body, 'pull');
-    setLoading(false);
-  };
-
-  const deleteModel = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccess(null);
-    setError(null);
-    setLogs([]);
-
-    const model = deleteModelNameRef.current!.value.trim();
-
-    if (!model) {
-      setError('Please fill in all fields.');
-      setLoading(false);
-      return;
-    }
-
+    clearValues();
     try {
       const response = await fetch('/api/models', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          // TODO: Add Authorization header with token
         },
-        body: JSON.stringify({ model: model }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -189,28 +148,87 @@ export default function ModelModal() {
         throw new Error(data.error || 'Failed to delete the model.');
       }
 
-      setSuccess('Operation successful');
+      setSuccess(getSuccessMessage());
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
       }
     } finally {
       setLoading(false);
-    }
+    };
   };
 
-  const getButtonLabel = () => {
+  const createModel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const body: CreateModelRequest = {
+      model: createModelNameRef.current!.value.trim(),
+      modelfile: createModelfileRef.current!.value.trim(),
+    };
+    await sendStreamedRequest(body);
+  };
+
+  const pullModel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const body: PullModelRequest = {
+      model: pullModelNameRef.current!.value.trim(),
+    };
+    await sendStreamedRequest(body);
+  };
+
+  const deleteModel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const body: DeleteModelRequest = {
+      model: deleteModelNameRef.current!.value.trim(),
+    };
+    await sendDeleteRequest(body);
+  };
+  
+  const getSuccessMessage = () => {
     switch (activeTab) {
       case 'create':
-        return loading ? 'Creating...' : 'Create Model';
+        return 'Model created successfully';
       case 'pull':
-        return loading ? 'Pulling...' : 'Pull Model';
+        return 'Model pulled successfully';
       case 'delete':
-        return loading ? 'Deleting...' : 'Delete Model';
+        return 'Model deleted successfully';
       default:
-        return loading ? 'Processing...' : 'Submit';
+        return 'Operation successful';
     }
+  }
+
+  const getButtonLabel = () => {
+    const getText = () => {
+      switch (activeTab) {
+        case 'create':
+          return loading ? 'Creating' : 'Create Model';
+        case 'pull':
+          return loading ? 'Pulling' : 'Pull Model';
+        case 'delete':
+          return loading ? 'Deleting' : 'Delete Model';
+        default:
+          return loading ? 'Processing' : 'Submit';
+      }
+    }
+    return (loading ?
+      <div className='flex justify-center items-center gap-2'>
+        <Spinner width='1' height='1' />
+        {getText()}
+      </div>
+      :
+      getText()
+    );
   };
+
+  const createSubmitButton = () => {
+    return (
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full bg-primaryColor text-white py-2 rounded-md hover:opacity-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          {getButtonLabel()}
+      </button>
+    )
+  }
 
   return (
     <>
@@ -220,11 +238,13 @@ export default function ModelModal() {
             <button
               key={option.value}
               onClick={() => handleTabChange(option.value)}
-              className={`py-2 px-4 ${
-                activeTab === option.value
+              className={`py-2 px-4
+                ${activeTab === option.value
                   ? 'border-b-2 border-primaryColor text-primaryColor'
                   : 'text-gray-500 dark:text-gray-300'
-              }`}
+                }
+                ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`
+              }
             >
               {option.label}
             </button>
@@ -241,6 +261,7 @@ export default function ModelModal() {
                 <label className="block mb-2">Model Name</label>
                 <input
                   type="text"
+                  autoFocus
                   ref={createModelNameRef}
                   required
                   className="w-full px-3 py-2 border rounded-md focus:outline-none"
@@ -254,12 +275,7 @@ export default function ModelModal() {
                   className="w-full px-3 py-2 border rounded-md focus:outline-none"
                 ></textarea>
               </div>
-              <button
-                type="submit"
-                className={`w-full bg-primaryColor text-white py-2 rounded-md hover:opacity-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {getButtonLabel()}
-              </button>
+              {createSubmitButton()}
             </form>
           </div>
         )}
@@ -272,17 +288,13 @@ export default function ModelModal() {
                 <label className="block mb-2">Model Name</label>
                 <input
                   type="text"
+                  autoFocus
                   ref={pullModelNameRef}
                   required
                   className="w-full px-3 py-2 border rounded-md focus:outline-none"
                 />
               </div>
-              <button
-                type="submit"
-                className={`w-full bg-primaryColor text-white py-2 rounded-md hover:opacity-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {getButtonLabel()}
-              </button>
+              {createSubmitButton()}
             </form>
           </div>
         )}
@@ -295,17 +307,13 @@ export default function ModelModal() {
                 <label className="block mb-2">Model Name</label>
                 <input
                   type="text"
+                  autoFocus
                   ref={deleteModelNameRef}
                   required
                   className="w-full px-3 py-2 border rounded-md focus:outline-none"
                 />
               </div>
-              <button
-                type="submit"
-                className={`w-full bg-primaryColor text-white py-2 rounded-md hover:opacity-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                {getButtonLabel()}
-              </button>
+              {createSubmitButton()}
             </form>
           </div>
         )}

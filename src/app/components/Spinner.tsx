@@ -1,13 +1,14 @@
 interface SpinnerProps {
-  width?: string;
-  height?: string;
+  width: string;
+  height: string;
 }
 
-export default function Spinner({ width = '16', height = '16' }: SpinnerProps) {
+export default function Spinner({ width, height }: SpinnerProps) {
   return (
     <div className="flex justify-center items-center h-full">
       <div
-        className={`w-${width} h-${height} border-2 border-gray-200 border-t-primaryColor rounded-full animate-spin`}
+        className={`border-2 border-gray-200 border-t-primaryColor rounded-full animate-spin`}
+        style={{ width: `${width}rem`, height: `${height}rem` }}
       ></div>
     </div>
   );

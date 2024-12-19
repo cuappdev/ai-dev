@@ -27,7 +27,7 @@ export default function ChatHistory({ chats }: History) {
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center">
           <span className="text-white text-semibold">
-            No chat history (Coming soon)
+            No chat history
           </span>
         </div>
       )}

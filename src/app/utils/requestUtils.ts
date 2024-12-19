@@ -40,7 +40,7 @@ export async function cloneRequest(request: NextRequest, url: string) {
     console.log('Cloned response body:', clonedResponse.body);
 
     if (!clonedResponse.ok || !clonedResponse.body) {
-      return NextResponse.json({ error: `Ollama API error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
+      return NextResponse.json({ error: `Ollama error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
     }
 
     const headers = new Headers(clonedResponse.headers);

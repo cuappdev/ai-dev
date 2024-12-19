@@ -11,7 +11,9 @@ interface ProvidersProps {
 const Providers = ({ children }: ProvidersProps) => {
   return (
     <AuthProvider>
-      <ModelProvider>{children}</ModelProvider>
+      <ModelProvider>
+        {children}
+      </ModelProvider>
     </AuthProvider>
   );
 };

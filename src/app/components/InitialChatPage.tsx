@@ -65,10 +65,6 @@ export default function InitialChatPage() {
           <span className="text-primaryColor font-semibold text-3xl">
             How can I help you today?
           </span>
-          <span className="text-primaryColor font-semibold text-3xl">
-            This page will work when I implement the db, just send anything
-            below and type your prompt on the next page
-          </span>
         </div>
 
         <div className="mb-10">

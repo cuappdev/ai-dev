@@ -1,5 +1,3 @@
-'use client';
-
 import React, { ReactNode, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -22,10 +20,10 @@ export default function Protected({ children }: ProtectedProps) {
   if (loading) {
     return (
       <div className="h-screen w-screen flex align-middle justify-center">
-        <Spinner />
+        <Spinner width='8' height='8' />
       </div>
     );
   }
 
-  return <>{user ? children : null}</>;
+  return <>{children}</>;
 }

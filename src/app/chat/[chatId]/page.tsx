@@ -13,12 +13,12 @@ import Protected from '@/app/components/Protected';
 import ChatHistoryNavbar from '@/app/components/ChatHistoryNavbar';
 import ChatHeader from '@/app/components/ChatHeader';
 import InputField from '@/app/components/InputField';
-import ChatMessage from '@/app/components/ChatMessage';
+import ChatMessage from '@/app/chat/[chatId]/ChatMessage';
 
 export default function ChatPage() {
   const { user } = useAuth();
   const { selectedModel } = useModel();
-  const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageStreaming, setMessageStreaming] = useState(false);
   const pathname = usePathname();
@@ -32,6 +32,12 @@ export default function ChatPage() {
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
   };
+
+  useEffect(() => {
+    if (window.innerWidth > 768) {
+      setIsNavbarOpen(true);
+    }
+  }, [])
 
   useEffect(() => {
     if (messagesEndRef.current) {

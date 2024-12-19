@@ -55,7 +55,7 @@ export default function ModelInfoModal() {
   };
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner width='4' height='4' />;
   }
 
   return (

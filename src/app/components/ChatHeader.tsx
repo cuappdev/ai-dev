@@ -87,7 +87,7 @@ export default function ChatHeader() {
       <div className="relative" ref={modelDropdownRef}>
         <div className="flex flex-row items-center">
           <div className={`${loading ? 'flex items-center' : 'hidden'} mr-2`}>
-            <Spinner width="6" height="6" />
+            <Spinner width="1" height="1" />
           </div>
 
           <button onClick={() => setIsModelInfoModalOpen(true)}>
