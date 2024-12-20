@@ -188,7 +188,7 @@ export default function ChatPage() {
 
   return (
     <Protected>
-      <div className="flex flex-row gap-0 w-full h-screen">
+      <div className="flex flex-row gap-0 w-full h-svh">
         <div
           className={`bg-black transition-all duration-300 flex-shrink-0 overflow-y-auto ${isNavbarOpen ? 'w-64' : 'w-0'}`}
         >

@@ -20,7 +20,7 @@ export default function Protected({ children }: ProtectedProps) {
   if (loading) {
     return (
       <div className="h-screen w-screen flex align-middle justify-center">
-        <Spinner width='4' height='4' />
+        <Spinner width='5' height='5' />
       </div>
     );
   }

@@ -27,7 +27,7 @@ export default function InitialChatPage() {
   };
 
   return (
-    <div className="flex flex-row gap-0 h-screen">
+    <div className="flex flex-row gap-0 h-svh">
       <div
         className={`bg-black transition-all duration-300 overscroll-none flex-shrink-0 ${isNavbarOpen ? 'w-64' : 'w-0'}`}
       >
