@@ -16,6 +16,7 @@ export async function DELETE(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const url: string = `/api/chat`;
   const encoder = new TextEncoder();
+  console.log(url, request, createClonedRequest);
 
   const customReadable = new ReadableStream({
     async start(controller) {
