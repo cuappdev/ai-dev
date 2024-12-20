@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cloneRequest, createClonedRequest } from '@/app/utils/requestUtils';
 
-export const runtime = "edge";
+export const runtime = 'edge';
 export const dynamic = "force-dynamic";
 
 // export async function POST(request: NextRequest) {
@@ -98,6 +98,7 @@ export async function POST(request: NextRequest) {
       "Content-Encoding": "none",
       "Cache-Control": "no-cache, no-transform",
       "Content-Type": "text/event-stream; charset=utf-8",
+      "Transfer-Encoding": "chunked",
     },
   });
 }
