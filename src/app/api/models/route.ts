@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cloneRequest, createClonedRequest } from '@/app/utils/requestUtils';
 
+export const dynamic = "force-dynamic";
+
 // export async function POST(request: NextRequest) {
 //   const url: string = `/api/chat`;
 //   const clonedResponse: NextResponse = await cloneRequest(request, url);
