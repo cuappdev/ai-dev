@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // TODO: Remove auth headers from cloned request
-async function createClonedRequest(request: NextRequest) {
+export async function createClonedRequest(request: NextRequest) {
   const init: RequestInit = {
     method: request.method,
     headers: (() => {
