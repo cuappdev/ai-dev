@@ -1,3 +1,5 @@
+// TODO: Clean up types
+
 export interface Message {
   id: string;
   chatId: string;

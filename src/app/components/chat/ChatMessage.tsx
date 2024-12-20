@@ -35,7 +35,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         alt={message.sender}
         className="rounded-full w-10 h-10 object-cover flex-shrink-0"
       />
-      <div className="flex flex-col">
+      <div className="flex flex-col overflow-auto">
         <span className="font-semibold text-lg">
           {message.sender.split(' ')[0]}
         </span>

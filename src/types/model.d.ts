@@ -1,3 +1,5 @@
+// TODO: Clean up types
+
 export interface CreateModelRequest {
   model: string;
   modelfile?: string;

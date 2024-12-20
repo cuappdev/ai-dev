@@ -1,3 +1,5 @@
+// TODO: Clean up types
+
 export interface EmbedRequest {
   model: string;
   input: string | string[];

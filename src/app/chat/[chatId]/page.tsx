@@ -222,7 +222,7 @@ export default function ChatPage() {
         <div className="w-full flex flex-col">
           <ChatHeader />
 
-          <div className="w-4/5 flex flex-grow flex-col gap-3 m-auto mt-10 mb-10 overflow-y-scroll no-scrollbar">
+          <div className="w-4/5 flex flex-grow flex-col gap-3 m-auto mt-5 mb-10 overflow-y-scroll no-scrollbar">
             {messages.map((message, index) => (
               <ChatMessage key={index} message={message} />
             ))}

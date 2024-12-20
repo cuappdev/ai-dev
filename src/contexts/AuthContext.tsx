@@ -6,15 +6,15 @@ import {
   ReactNode,
 } from 'react';
 import {
-  GoogleAuthProvider,
   signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   User,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/firebase';
+import { auth, provider } from '@/firebase-config';
 
+// TODO: Add JWT for authentication
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async () => {
     setError(null);
-    const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider).catch((error) => {
       setError((error as FirebaseAuthError).message);
     });
