@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cloneRequest, createClonedRequest } from '@/app/utils/requestUtils';
 
+export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 // export async function POST(request: NextRequest) {
