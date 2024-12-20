@@ -6,7 +6,7 @@ import {
   PullModelResponse,
 } from '@/types/model';
 import { useState, useRef } from 'react';
-import Spinner from './Spinner';
+import Spinner from '../Spinner';
 
 interface ModelModalProps {
   loading: boolean;

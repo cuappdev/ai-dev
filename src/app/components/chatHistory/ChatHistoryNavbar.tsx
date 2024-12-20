@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 import { ChatHistory as History } from '@/types/chat';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Spinner from './Spinner';
+import Spinner from '../Spinner';
 import ChatHistory from './ChatHistory';
-import ModelModal from './ModelModal';
-import EmbedModal from './EmbedModal';
-import Modal from './Modal';
+import ModelModal from '../modals/ModelModal';
+import EmbedModal from '../modals/EmbedModal';
+import Modal from '../modals/Modal';
 
 // TODO: Fix page extending beyond the viewport
 // TODO: Fetch chat history from the server

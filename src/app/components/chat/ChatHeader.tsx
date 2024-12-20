@@ -1,9 +1,9 @@
 import { useModel } from '@/contexts/ModelContext';
 import { AllModelsResponse } from '@/types/model';
 import { useState, useEffect, useRef } from 'react';
-import Modal from './Modal';
-import ModelInfoModal from './ModelInfoModal';
-import Spinner from './Spinner';
+import Modal from '../modals/Modal';
+import ModelInfoModal from '../modals/ModelInfoModal';
+import Spinner from '../Spinner';
 
 export default function ChatHeader() {
   const { selectedModel, setSelectedModel } = useModel();

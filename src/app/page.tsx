@@ -12,7 +12,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="h-screen w-screen flex align-middle justify-center">
-        <Spinner width='8' height='8' />
+        <Spinner width='5' height='5' />
       </div>
     );
   }

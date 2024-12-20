@@ -63,6 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     await firebaseSignOut(auth)
       .then(() => {
+        setUser(null);
         router.push('/');
       })
       .catch((error) => {

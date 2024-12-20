@@ -10,10 +10,10 @@ import {
   Message,
 } from '@/types/chat';
 import Protected from '@/app/components/Protected';
-import ChatHistoryNavbar from '@/app/components/ChatHistoryNavbar';
-import ChatHeader from '@/app/components/ChatHeader';
+import ChatHistoryNavbar from '@/app/components/chatHistory/ChatHistoryNavbar';
+import ChatHeader from '@/app/components/chat/ChatHeader';
 import InputField from '@/app/components/InputField';
-import ChatMessage from '@/app/chat/[chatId]/ChatMessage';
+import ChatMessage from '@/app/components/chat/ChatMessage';
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -67,138 +67,110 @@ export default function ChatPage() {
   const sendStreamedMessage = async (message: string) => {
     const body = createChatCompletionRequestBody(message);
     try {
-      const initialResponse = await fetch(`/api/models`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!initialResponse.ok || !initialResponse.body) {
-        const data = await initialResponse.json();
-        throw new Error(data.error || 'Failed to send message.');
-      }
-
-      const reader = initialResponse.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
-      let done = false;
-
-      while (!done) {
-        const { value, done: streamDone } = await reader.read();
-        done = streamDone;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              const response: ChatStreamCompletionResponse = JSON.parse(line);
-              setMessages((prevMessages) => {
-                const lastMessage = prevMessages[prevMessages.length - 1];
-                if (lastMessage && lastMessage.sender !== user!.displayName!) {
-                  lastMessage.content += response!.message!.content;
-                  return [
-                    ...prevMessages.slice(0, -1),
-                    {
-                      ...lastMessage,
-                      content: lastMessage.content + response!.message!.content,
-                    },
-                  ];
-                } else {
-                  return [
-                    ...prevMessages,
-                    {
-                      id: `${messages.length + 1}`,
-                      chatId: chatId,
-                      content: response!.message!.content,
-                      timestamp: new Date().toLocaleString(),
-                      sender: selectedModel,
-                    },
-                  ];
-                }
-              });
-
-              if (response.done) {
-                done = true;
-                break;
-              }
-            } catch (error) {
-              const errorMessage = {
-                id: `${messages.length + 1}`,
-                chatId: chatId,
-                content: `The following error occurred while processing your request:\n${error}\n Please try again.`,
-                timestamp: new Date().toLocaleString(),
-                sender: selectedModel,
-              };
-              setMessages((prevMessages) => [...prevMessages, errorMessage]);
-              done = true;
-            } finally {
-              setMessageStreaming(false);
-            }
-
-          }
-        }
-      }
-
-      if (buffer.trim()) {
-        try {
-          const response: ChatStreamCompletionResponse =
-            JSON.parse(buffer);
-            setMessages((prevMessages) => {
-              const lastMessage = prevMessages[prevMessages.length - 1];
-              if (lastMessage && lastMessage.sender !== user!.displayName!) {
-                lastMessage.content += response!.message!.content;
-                return [
-                  ...prevMessages.slice(0, -1),
-                  {
-                    ...lastMessage,
-                    content: lastMessage.content + response!.message!.content,
-                  },
-                ];
-              } else {
-                return [
-                  ...prevMessages,
-                  {
-                    id: `${messages.length + 1}`,
-                    chatId: chatId,
-                    content: response!.message!.content,
-                    timestamp: new Date().toLocaleString(),
-                    sender: selectedModel,
-                  },
-                ];
-              }
-            });
-        } catch (parseError: unknown) {
-          if (parseError instanceof Error) {
-            const errorMessage = {
-              id: `${messages.length + 1}`,
-              chatId: chatId,
-              content: `The following error occurred while processing your request:\n${parseError.message}\n Please try again.`,
-              timestamp: new Date().toLocaleString(),
-              sender: selectedModel,
-            };
-            setMessages((prevMessages) => [...prevMessages, errorMessage]);
-          }
-        }
-      }
+      const reader = await fetchChatResponse(body);
+      await processStreamedResponse(reader);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-          const errorMessage = {
-            id: `${messages.length + 1}`,
-            chatId: chatId,
-            content: `The following error occurred while processing your request:\n${error.message}\n Please try again.`,
-            timestamp: new Date().toLocaleString(),
-            sender: selectedModel,
-          };
-          setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      displayError(error);
+    } finally {
+      setMessageStreaming(false);
+    }
+  };
+  
+  const fetchChatResponse = async (body: ChatCompletionRequest) => {
+    const response = await fetch(`/api/models`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+  
+    if (!response.ok || !response.body) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to send message.');
+    }
+  
+    return response.body.getReader();
+  };
+  
+  const processStreamedResponse = async (reader: ReadableStreamDefaultReader) => {
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let done = false;
+  
+    while (!done) {
+      const { value, done: streamDone } = await reader.read();
+      done = streamDone;
+      buffer += decoder.decode(value, { stream: true });
+  
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() || '';
+  
+      for (const line of lines) {
+        if (line.trim()) {
+          try {
+            const response: ChatStreamCompletionResponse = JSON.parse(line);
+            updateMessages(response);
+            if (response.done) {
+              done = true;
+              break;
+            }
+          } catch (error) {
+            displayError(error);
+            done = true;
+          }
+        }
       }
     }
   
-    };
+    if (buffer.trim()) {
+      try {
+        const response: ChatStreamCompletionResponse = JSON.parse(buffer);
+        updateMessages(response);
+      } catch (error) {
+        displayError(error);
+      }
+    }
+  };
+  
+  const updateMessages = (response: ChatStreamCompletionResponse) => {
+    setMessages((prevMessages) => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      if (lastMessage && lastMessage.sender !== user!.displayName!) {
+        return [
+          ...prevMessages.slice(0, -1),
+          {
+            ...lastMessage,
+            content: lastMessage.content + response.message!.content,
+          },
+        ];
+      } else {
+        return [
+          ...prevMessages,
+          {
+            id: `${messages.length + 1}`,
+            chatId: chatId,
+            content: response.message!.content,
+            timestamp: new Date().toLocaleString(),
+            sender: selectedModel,
+          },
+        ];
+      }
+    });
+  };
+  
+  const displayError = (error: unknown) => {
+    if (error instanceof Error) {
+      const errorMessage = {
+        id: `${messages.length + 1}`,
+        chatId: chatId,
+        content: `The following error occurred while processing your request:\n${error.message}\nPlease try again.`,
+        timestamp: new Date().toLocaleString(),
+        sender: selectedModel,
+      };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    }
+  };
 
   const processSubmit = async (message: string) => {
     const userMessage: Message = {

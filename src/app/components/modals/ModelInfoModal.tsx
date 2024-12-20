@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useModel } from '@/contexts/ModelContext';
 import { ModelInfoResponse } from '@/types/model';
-import Spinner from './Spinner';
+import Spinner from '../Spinner';
 
 export default function ModelInfoModal() {
   const { selectedModel } = useModel();

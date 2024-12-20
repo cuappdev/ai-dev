@@ -1,7 +1,7 @@
 'use client';
 
-import ChatHistoryNavbar from '@/app/components/ChatHistoryNavbar';
-import ChatHeader from './ChatHeader';
+import ChatHistoryNavbar from '@/app/components/chatHistory/ChatHistoryNavbar';
+import ChatHeader from './chat/ChatHeader';
 import InputField from './InputField';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
