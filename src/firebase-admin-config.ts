@@ -3,8 +3,8 @@ import * as admin from "firebase-admin";
 let adminAuth: admin.auth.Auth | null = null;
 
 const getServiceAccount = () => {
+  console.log(process.env.ADMIN_FIREBASE_PRIVATE_KEY);
   const { privateKey } = JSON.parse(process.env.ADMIN_FIREBASE_PRIVATE_KEY!);
-  console.log(privateKey);
 
   return {
     projectId: process.env.ADMIN_FIREBASE_PROJECT_ID,
