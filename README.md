@@ -42,6 +42,12 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 curl -X POST "http://0.0.0.0:11434/api/pull" -d '{"model":"llama3.2:1b"}'
 curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "prompt":"hello"}'
 
+-H "Content-Type: application/json" \
+
+curl -X POST "http://localhost:3000/api/models" \
+-d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}' \
+--verbose
+
 curl -H "Origin: https://ai.cornellappdev.com" \
  -H "Access-Control-Request-Method: POST" \
  -H "Access-Control-Request-Headers: X-Requested-With" \

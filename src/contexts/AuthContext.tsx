@@ -1,3 +1,5 @@
+'use client';
+
 import {
   createContext,
   useContext,
@@ -95,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       const token = await currentUser.getIdToken();
       try {
-        const response = await fetch('/api/users/authenticate', {
+        const response = await fetch('/api/authenticate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

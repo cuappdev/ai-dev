@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-// import adminAuth from "../../firebase-admin-config";
+import adminAuth from "../../../firebase-admin-config";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -10,9 +10,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // const firebaseUser = await adminAuth.verifyIdToken(token);
+    const firebaseUser = await adminAuth.verifyIdToken(token);
 
     // TODO: Check if in database or special user
+    console.log(firebaseUser);
     // const uid = firebaseUser.uid;
     // return NextResponse.json('You must be part of Cornell AppDev to use this app', { status: 403 });
 

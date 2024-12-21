@@ -16,7 +16,7 @@ import InputField from '@/app/components/InputField';
 import ChatMessage from '@/app/components/chat/ChatMessage';
 
 export default function ChatPage() {
-  const { user } = useAuth();
+  const { user, idToken, refreshToken } = useAuth();
   const { selectedModel } = useModel();
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -81,9 +81,15 @@ export default function ChatPage() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify(body),
     });
+
+    if (response.status === 401) {
+      await refreshToken();
+      return fetchChatResponse(body);
+    }
   
     if (!response.ok || !response.body) {
       const data = await response.json();
