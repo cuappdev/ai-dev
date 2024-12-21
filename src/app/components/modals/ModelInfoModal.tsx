@@ -28,7 +28,7 @@ export default function ModelInfoModal() {
         });
     };
     fetchData();
-  }, []);
+  }, [selectedModel]);
 
   const printModelData = (
     modelData: ModelInfoResponse
