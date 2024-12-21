@@ -12,7 +12,7 @@ const getFirebaseAdminConfig = () => {
   try {
     privateKey = JSON.parse(privateKeyEnv);
   } catch (error) {
-    throw new Error('Failed to parse ADMIN_FIREBASE_PRIVATE_KEY as JSON');
+    throw new Error((error as Error).message);
   }
 
   return {
