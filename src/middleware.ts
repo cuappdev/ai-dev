@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
       });
     },
     handleInvalidToken: async (_reason) => {
+      console.log("reason", _reason);
       return NextResponse.json({ error: 'Invalid token - please login again' }, { status: 401 });
     },
     handleError: async (error) => {
