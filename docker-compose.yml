@@ -6,6 +6,8 @@ services:
 
   ai-dev-app:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json
     ports:
       - "3000:3000"
     env_file:

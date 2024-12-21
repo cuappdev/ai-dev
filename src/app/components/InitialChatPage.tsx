@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 export default function InitialChatPage() {
   const { user } = useAuth();
   const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
-  const firstName = user!.displayName?.split(' ')[0];
+  const firstName = user!.displayName!.split(' ')[0];
   const router = useRouter();
 
   const toggleNavbar = () => {
