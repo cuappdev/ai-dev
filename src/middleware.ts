@@ -24,10 +24,14 @@ export async function middleware(request: NextRequest) {
     },
     handleValidToken: async ({token, decodedToken, customToken}, headers) => {
       // TODO: Check if user is in the database
+      console.log(request);
+
+      const requestHeaders = new Headers(headers);
+      requestHeaders.set('uid', decodedToken.uid);
 
       return NextResponse.next({
         request: {
-          headers
+          headers: requestHeaders
         }
       });
     },
