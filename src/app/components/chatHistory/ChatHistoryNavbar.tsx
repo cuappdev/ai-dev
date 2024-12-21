@@ -9,7 +9,6 @@ import ModelModal from '../modals/ModelModal';
 import EmbedModal from '../modals/EmbedModal';
 import Modal from '../modals/Modal';
 
-// TODO: Fix page extending beyond the viewport
 // TODO: Fetch chat history from the server
 
 interface ChatHistoryNavbarProps {

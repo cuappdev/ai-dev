@@ -48,6 +48,8 @@ curl -X POST "http://localhost:3000/api/models" \
 -d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}' \
 --verbose
 
+curl -X GET "https://ai.cornellappdev.com/api/models/all"
+
 curl -H "Origin: https://ai.cornellappdev.com" \
  -H "Access-Control-Request-Method: POST" \
  -H "Access-Control-Request-Headers: X-Requested-With" \

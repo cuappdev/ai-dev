@@ -19,12 +19,10 @@ import { auth, provider } from '@/firebase-config';
 
 interface AuthContextType {
   user: User | null;
-  idToken: string | null;
   loading: boolean;
   error: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  refreshToken: () => Promise<void>;
 }
 
 interface FirebaseAuthError {
@@ -35,12 +33,10 @@ interface FirebaseAuthError {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  idToken: null,
   loading: true,
   error: null,
   signInWithGoogle: async () => {},
   signOut: async () => {},
-  refreshToken: async () => {},
 });
 
 export const useAuth = () => {
@@ -53,7 +49,6 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [idToken, setIdToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -79,30 +74,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
   };
 
-  const refreshToken = async () => {
-    if (!user) return;
-    const newToken = await user.getIdToken(true);
-    setIdToken(newToken);
-  };
-
   useEffect(() => {
     const authChange = onAuthStateChanged(auth, async (currentUser) => {
       // User has not been authenticated or has signed out
       if (!currentUser) {
         setUser(null);
-        setIdToken(null);
         setLoading(false);
+        await fetch("/api/logout", {
+          method: "GET",
+        });
         return
       }
       
       const token = await currentUser.getIdToken();
       try {
         const response = await fetch('/api/authenticate', {
-          method: 'POST',
+          method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token }),
+            Authorization: `Bearer ${token}`,
+          }
         });
 
         if (!response.ok) {
@@ -110,7 +100,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         
         setUser(currentUser);
-        setIdToken(token);
       } catch (error) {
         setError((error as Error).message);
       } finally {
@@ -122,7 +111,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, idToken, loading, error, signInWithGoogle, signOut, refreshToken }}
+      value={{ user, loading, error, signInWithGoogle, signOut }}
     >
       {children}
     </AuthContext.Provider>

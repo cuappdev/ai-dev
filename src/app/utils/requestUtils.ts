@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ApiError } from '@/types/ApiError';
 
 export async function createClonedRequest(request: NextRequest) {
   const init: RequestInit = {
@@ -54,4 +55,36 @@ export async function cloneRequest(request: NextRequest, url: string) {
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 500 });
   }
+}
+
+export function getAuthHeader(request: NextRequest) {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader) {
+    throw new ApiError('Authorization header is required', 401);
+  }
+  return authHeader;
+}
+
+export function getTokenFromHeader(authHeader: string) {
+  const token = authHeader.split('Bearer ')[1];
+  if (!token) {
+    throw new ApiError('Bearer token is required', 401);
+  }
+  return token;
+}
+
+// export async function validateToken(token: string) {
+//   const firebaseUser = await getAdminAuth()!.verifyIdToken(token);
+//   if (!firebaseUser) {
+//     throw new ApiError('Unauthorized', 401);
+//   }
+//   return firebaseUser;
+// }
+
+export async function isUserInDatabase(firebaseUser: any) {
+  console.log(firebaseUser);
+  // TODO: Check if user is in database
+  // const uid = firebaseUser.uid;
+  // return NextResponse.json('You must be part of Cornell AppDev to use this app', { status: 403 });
+  return true;
 }

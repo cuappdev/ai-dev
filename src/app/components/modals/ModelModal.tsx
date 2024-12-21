@@ -5,7 +5,6 @@ import {
   PullModelRequest,
   PullModelResponse,
 } from '@/types/model';
-import { useAuth } from '@/contexts/AuthContext';
 import { useState, useRef } from 'react';
 import Spinner from '../Spinner';
 
@@ -28,7 +27,6 @@ const tabOptions: TabOptionConfig[] = [
 ];
 
 export default function ModelModal({ loading, setLoading }: ModelModalProps) {
-  const { idToken, refreshToken } = useAuth();
   const [activeTab, setActiveTab] = useState<TabOption>('create');
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,15 +60,9 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify(body),
       });
-
-      if (initialResponse.status === 401) {
-        await refreshToken();
-        return sendStreamedRequest(body);
-      }
 
       if (!initialResponse.ok || !initialResponse.body) {
         const data = await initialResponse.json();
@@ -145,15 +137,9 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify(body),
       });
-
-      if (response.status === 401) {
-        await refreshToken();
-        return sendDeleteRequest(body);
-      }
 
       if (!response.ok) {
         const data = await response.json();
