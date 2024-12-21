@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import adminAuth from "../../../firebase-admin-config";
+import { adminAuth } from "../../../firebase-admin-config";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
