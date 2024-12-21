@@ -22,11 +22,21 @@ const getFirebaseAdminConfig = () => {
   };
 };
 
-if (!admin.apps.length) {
-  const serviceAccount = getFirebaseAdminConfig();
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+let adminAuth: admin.auth.Auth | null = null;
 
-export const adminAuth = admin.auth();
+const initializeFirebaseAdmin = () => {
+  if (!admin.apps.length) {
+    const serviceAccount = getFirebaseAdminConfig();
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  }
+  adminAuth = admin.auth();
+};
+
+export const getAdminAuth = () => {
+  if (!adminAuth) {
+    initializeFirebaseAdmin();
+  }
+  return adminAuth;
+};

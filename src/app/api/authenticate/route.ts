@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminAuth } from "../../../firebase-admin-config";
+import { getAdminAuth } from "../../../firebase-admin-config";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const firebaseUser = await adminAuth.verifyIdToken(token);
+    const firebaseUser = await getAdminAuth()!.verifyIdToken(token);
 
     // TODO: Check if in database or special user
     console.log(firebaseUser);
