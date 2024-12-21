@@ -24,7 +24,10 @@ export async function middleware(request: NextRequest) {
     },
     handleValidToken: async ({token, decodedToken, customToken}, headers) => {
       // TODO: Check if user is in the database
-      console.log(request);
+      console.log("request", request);
+      console.log("token", token);
+      console.log("decodedToken", decodedToken);
+      console.log("customToken", customToken);
 
       const requestHeaders = new Headers(headers);
       requestHeaders.set('uid', decodedToken.uid);
