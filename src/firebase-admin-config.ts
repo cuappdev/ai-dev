@@ -1,10 +1,11 @@
 import * as admin from "firebase-admin";
+import { env } from 'next-runtime-env';
 
-const { privateKey } = JSON.parse(process.env.ADMIN_FIREBASE_PRIVATE_KEY!);
+const { privateKey } = JSON.parse(env('ADMIN_FIREBASE_PRIVATE_KEY')!);
 
 const serviceAccount: admin.ServiceAccount = {
-  projectId: process.env.ADMIN_FIREBASE_PROJECT_ID,
-  clientEmail: process.env.ADMIN_FIREBASE_CLIENT_EMAIL,
+  projectId: env('ADMIN_FIREBASE_PROJECT_ID'),
+  clientEmail: env('ADMIN_FIREBASE_CLIENT_EMAIL'),
   privateKey,
 };
 
