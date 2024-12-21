@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { env } from 'next-runtime-env';
 
@@ -12,6 +12,6 @@ const firebaseConfig = {
   measurementId: env('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID'),
 };
 
-export const app = initializeApp(firebaseConfig);
+export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
