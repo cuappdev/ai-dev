@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ApiError } from '@/types/ApiError';
 
 export async function createClonedRequest(request: NextRequest) {
   const init: RequestInit = {
@@ -57,10 +56,9 @@ export async function cloneRequest(request: NextRequest, url: string) {
   }
 }
 
-// export async function isUserInDatabase(firebaseUser: any) {
-//   console.log(firebaseUser);
-//   // TODO: Check if user is in database
-//   // const uid = firebaseUser.uid;
-//   // return NextResponse.json('You must be part of Cornell AppDev to use this app', { status: 403 });
-//   return true;
-// }
+export async function getUserFromDatabase(uid: string) {
+  console.log(uid);
+  // TODO: Check if user is in database
+  // Return user if it exists, otherwise return null
+  return true;
+}
