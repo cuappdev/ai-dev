@@ -6,7 +6,7 @@ import { env } from 'next-runtime-env';
 interface ModelContextType {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
-}
+};
 
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
@@ -14,7 +14,7 @@ export const useModel = () => {
   const context = useContext(ModelContext);
   if (!context) {
     throw new Error('useModel must be used within a ModelProvider');
-  }
+  };
   return context;
 };
 

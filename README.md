@@ -45,8 +45,8 @@ curl -X POST "http://0.0.0.0:11434/api/generate" -d '{"model":"llama3.2:1b", "pr
 -H "Content-Type: application/json" \
 
 curl -X POST "http://localhost:3000/api/models" \
--d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}' \
---verbose
+--cookie "" \
+-d '{"model":"llama3.2:1b", "messages": [{"role":"user", "content":"Hello"}]}'
 
 curl -X GET "https://ai.cornellappdev.com/api/models/all"
 

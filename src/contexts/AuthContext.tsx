@@ -20,6 +20,7 @@ import { auth, provider } from '@/firebase-config';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  // TODO: Remove once there is a toast
   error: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -34,6 +35,7 @@ interface FirebaseAuthError {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  // TODO: Remove once there is a toast
   error: null,
   signInWithGoogle: async () => {},
   signOut: async () => {},
@@ -50,6 +52,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  // TODO: Remove once there is a toast
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -57,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     await signInWithPopup(auth, provider)
       .catch((error) => {
+        // TODO: Add toast to tell user there is an error
         setError((error as FirebaseAuthError).message);
       }
     );
@@ -65,52 +69,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     setError(null);
     await firebaseSignOut(auth)
-      .then(() => {
+      .then(async () => {
         router.push('/');
+        await fetch("/api/logout");
       })
-      // TODO: Add toast to tell user there is an error
       .catch((error) => {
+        // TODO: Add toast to tell user there is an error
         setError((error as FirebaseAuthError).message);
       });
   };
 
   useEffect(() => {
     const authChange = onAuthStateChanged(auth, async (currentUser) => {
-      // User has not been authenticated or has signed out
       if (!currentUser) {
         setUser(null);
         setLoading(false);
-        await fetch("/api/logout", {
-          method: "GET",
-        });
-        return
-      }
+        return;
+      };
       
-      const token = await currentUser.getIdToken();
       try {
-        const response = await fetch('/api/authenticate', {
-          method: 'GET',
+        const token = await currentUser.getIdToken();
+        const firebaseResponse = await fetch('/api/login', {
           headers: {
             Authorization: `Bearer ${token}`,
           }
         });
 
-        if (!response.ok) {
-          throw new Error(await response.text());
+        if (!firebaseResponse.ok) {
+          throw new Error(await firebaseResponse.text());
+        }
+
+        const authenticateResponse = await fetch('/api/authenticate');
+
+        if (!authenticateResponse.ok) {
+          throw new Error(await authenticateResponse.text());
         }
         
         setUser(currentUser);
       } catch (error) {
+        // TODO: Add toast to tell user there is an error
         setError((error as Error).message);
+        setUser(null);
       } finally {
         setLoading(false);
-      }
+      };
     });
     return () => authChange();
   }, []);
 
   return (
     <AuthContext.Provider
+      // TODO: Remove once there is a toast
       value={{ user, loading, error, signInWithGoogle, signOut }}
     >
       {children}
