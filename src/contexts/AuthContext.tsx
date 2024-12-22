@@ -89,26 +89,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       try {
         const token = await currentUser.getIdToken();
-        const firebaseResponse = await fetch('/api/login', {
+        // Validate firebase token
+        const firebaseMiddlewareResponse = await fetch('/api/login', {
           headers: {
             Authorization: `Bearer ${token}`,
           }
         });
-
-        if (!firebaseResponse.ok) {
-          throw new Error(await firebaseResponse.text());
+        if (!firebaseMiddlewareResponse.ok) {
+          throw new Error(await firebaseMiddlewareResponse.text());
         }
 
-        const authenticateResponse = await fetch('/api/authenticate');
-
-        if (!authenticateResponse.ok) {
-          throw new Error(await authenticateResponse.text());
+        // Ensure user is in the database
+        const userResponse  = await fetch('/api/authenticate');
+        if (!userResponse.ok) {
+          throw new Error(await userResponse.text());
         }
         
         setUser(currentUser);
       } catch (error) {
         // TODO: Add toast to tell user there is an error
-        setError((error as Error).message);
+        setError(JSON.parse((error as Error).message).message);
         setUser(null);
       } finally {
         setLoading(false);

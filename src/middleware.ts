@@ -27,13 +27,13 @@ export async function middleware(request: NextRequest) {
       const uid = decodedToken.uid;
 
       // TODO: Check if user is in the database
-      // if (true) {
-      //   const response = NextResponse.json({ error: 'You must be part of Cornell AppDev to use this app' }, { status: 401 });
-      //   response.cookies.set(process.env.AUTH_COOKIE_NAME!, '', {
-      //     expires: new Date(0),
-      //   });
-      //   return response;
-      // }
+      if (!decodedToken.email?.endsWith('@cornell.edu')) {
+        const response = NextResponse.json({ message: 'Only Cornell AppDev members can use this app' }, { status: 401 });
+        response.cookies.set(process.env.AUTH_COOKIE_NAME!, '', {
+          expires: new Date(0),
+        });
+        return response;
+      }
 
       const forwardedHeaders = new Headers(headers);
       forwardedHeaders.set('uid', uid);
@@ -53,10 +53,10 @@ export async function middleware(request: NextRequest) {
           }
         });
       }
-      return NextResponse.json({ error: `${message} - please login again` }, { status: 401 });
+      return NextResponse.json({ sucess: false, message: `${message} - please login again` }, { status: 401 });
     },
     handleError: async (error) => {
-      return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+      return NextResponse.json({ success:false, message: (error as Error).message }, { status: 500 });
     }
   });
 }
