@@ -5,8 +5,11 @@ const { privateKey } = JSON.parse(process.env.FIREBASE_ADMIN_PRIVATE_KEY!);
 
 export async function middleware(request: NextRequest) {
   // TODO: Cache the middleware
+  // TODO: Move check for user in database once Node.js runtime support is added to next middleware (https://github.com/vercel/next.js/discussions/71727)
   return authMiddleware(request, {
+    // Sets cookie
     loginPath: '/api/login',
+    // Deletes cookie
     logoutPath: '/api/logout',
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
     cookieName: process.env.AUTH_COOKIE_NAME!,
@@ -31,22 +34,14 @@ export async function middleware(request: NextRequest) {
         if (!decodedToken.email!.toLowerCase().endsWith('@cornell.edu')) {
           throw new Error('Please sign in with your Cornell email');
         }
-
-        // TODO: Check if user is in the database
-        // throw new Error('Only Cornell AppDev members can use this app');
-
       } catch (error) {
-        // Send error response and delete cookie
         const response = NextResponse.json({ message: (error as Error).message }, { status: 401 });
-        response.cookies.set(process.env.AUTH_COOKIE_NAME!, '', {
-          expires: new Date(0),
-        });
         return response;
       };
 
       const forwardedHeaders = new Headers(headers);
       forwardedHeaders.set('uid', uid);
-      // TODO: Forward along the user's role
+      forwardedHeaders.set('email', decodedToken.email!);
       return NextResponse.next({
         request: {
           headers: forwardedHeaders,

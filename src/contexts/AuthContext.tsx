@@ -14,7 +14,7 @@ import {
   User,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { auth, provider } from '@/firebase-config';
+import { auth, provider } from '@/firebase';
 
 
 interface AuthContextType {

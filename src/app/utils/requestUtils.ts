@@ -55,10 +55,3 @@ export async function cloneRequest(request: NextRequest, url: string) {
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }
-
-export async function getUserFromDatabase(uid: string) {
-  console.log(uid);
-  // TODO: Check if user is in database
-  // Return user if it exists, otherwise return null
-  return true;
-}
