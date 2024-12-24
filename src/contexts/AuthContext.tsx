@@ -96,12 +96,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         });
         if (!firebaseMiddlewareResponse.ok) {
+          await signOut();
           throw new Error(await firebaseMiddlewareResponse.text());
         }
 
         // Ensure user is in the database
         const userResponse  = await fetch('/api/authenticate');
         if (!userResponse.ok) {
+          await signOut();
           throw new Error(await userResponse.text());
         }
         
@@ -115,7 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
     });
     return () => authChange();
-  }, []);
+  });
 
   return (
     <AuthContext.Provider

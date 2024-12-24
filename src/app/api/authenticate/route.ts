@@ -1,8 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Middleware handles auth, if it succeeds return 200
-  console.log('GET /api/authenticate');
-  console.log(request.headers.get('uid'));
   return NextResponse.json({ success: true });
 }

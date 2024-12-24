@@ -4,6 +4,7 @@ import { authMiddleware } from 'next-firebase-auth-edge';
 const { privateKey } = JSON.parse(process.env.FIREBASE_ADMIN_PRIVATE_KEY!);
 
 export async function middleware(request: NextRequest) {
+  // TODO: Cache the middleware
   return authMiddleware(request, {
     loginPath: '/api/login',
     logoutPath: '/api/logout',
@@ -26,14 +27,22 @@ export async function middleware(request: NextRequest) {
     handleValidToken: async ({ decodedToken }, headers) => {
       const uid = decodedToken.uid;
 
-      // TODO: Check if user is in the database
-      if (!decodedToken.email?.endsWith('@cornell.edu')) {
-        const response = NextResponse.json({ message: 'Only Cornell AppDev members can use this app' }, { status: 401 });
+      try {
+        if (!decodedToken.email!.toLowerCase().endsWith('@cornell.edu')) {
+          throw new Error('Please sign in with your Cornell email');
+        }
+
+        // TODO: Check if user is in the database
+        // throw new Error('Only Cornell AppDev members can use this app');
+
+      } catch (error) {
+        // Send error response and delete cookie
+        const response = NextResponse.json({ message: (error as Error).message }, { status: 401 });
         response.cookies.set(process.env.AUTH_COOKIE_NAME!, '', {
           expires: new Date(0),
         });
         return response;
-      }
+      };
 
       const forwardedHeaders = new Headers(headers);
       forwardedHeaders.set('uid', uid);
@@ -52,12 +61,12 @@ export async function middleware(request: NextRequest) {
             headers: request.headers,
           }
         });
-      }
+      };
       return NextResponse.json({ sucess: false, message: `${message} - please login again` }, { status: 401 });
     },
     handleError: async (error) => {
       return NextResponse.json({ success:false, message: (error as Error).message }, { status: 500 });
-    }
+    },
   });
 }
 
