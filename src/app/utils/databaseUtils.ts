@@ -25,7 +25,7 @@ export async function deleteEmail(email: string) {
   });
 }
 
-export async function upsertUserFromEmail(email: Email, uid: string) {
+export async function upsertUserFromEmail(email: { id: string; email: string }, uid: string) {
   return await prisma.user.upsert({
     where: {
       uid: uid,
