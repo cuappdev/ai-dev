@@ -3,14 +3,6 @@ services:
     image: ollama/ollama
     networks:
       - app-network
-  
-  prepopulate:
-    image: cornellappdev/ai-dev:${IMAGE_TAG}
-    command: ["npx", "prisma", "db", "seed"]
-    env_file:
-      - .env
-    networks:
-      - app-network
 
   ai-dev-app:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
@@ -20,7 +12,6 @@ services:
       - .env
     depends_on:
       - ollama
-      - prepopulate
     networks:
       - app-network
 
