@@ -6,7 +6,7 @@ services:
   
   prepopulate:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
-    command: ["npx", "tsx", "scripts/prepopulateEmails.ts"]
+    command: ["npx", "ts-node", "scripts/prepopulateEmails.ts"]
     env_file:
       - .env
     networks:
