@@ -14,8 +14,12 @@ services:
       - .env
     depends_on:
       - ollama
+      - prepopulate
     networks:
       - app-network
+  
+  prepopulate:
+    command: ["npx", "tsx", "scripts/prepopulateEmails.ts"]
 
 networks:
   app-network:
