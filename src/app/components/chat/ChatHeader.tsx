@@ -19,30 +19,28 @@ export default function ChatHeader() {
   const openModelDropdown = async () => {
     if (modelDropdownOpen) return;
     setLoading(true);
-    await Promise.all([fetchAllModels(), fetchActiveModels()]).catch(
-      (error) => {
-        console.error(error);
-        setAvailableModels({
-          models: [
-            {
-              name: 'Unable to load models',
-              modified_at: '',
-              size: 0,
-              digest: '',
-              details: {
-                format: '',
-                family: '',
-                families: null,
-                parameter_size: '',
-                quantization_level: '',
-              },
-              expires_at: '',
-              size_vram: 0,
+    await Promise.all([fetchAllModels(), fetchActiveModels()]).catch((error) => {
+      console.error(error);
+      setAvailableModels({
+        models: [
+          {
+            name: 'Unable to load models',
+            modified_at: '',
+            size: 0,
+            digest: '',
+            details: {
+              format: '',
+              family: '',
+              families: null,
+              parameter_size: '',
+              quantization_level: '',
             },
-          ],
-        });
-      }
-    );
+            expires_at: '',
+            size_vram: 0,
+          },
+        ],
+      });
+    });
     setModelDropdownOpen(true);
     setLoading(false);
   };
@@ -67,10 +65,7 @@ export default function ChatHeader() {
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      modelDropdownRef.current &&
-      !modelDropdownRef.current.contains(event.target as Node)
-    ) {
+    if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
       setModelDropdownOpen(false);
     }
   };
@@ -83,7 +78,7 @@ export default function ChatHeader() {
   }, []);
 
   return (
-    <div className="flex flex-row pt-3 justify-end items-center w-11/12 m-auto">
+    <div className="m-auto flex w-11/12 flex-row items-center justify-end pt-3">
       <div className="relative" ref={modelDropdownRef}>
         <div className="flex flex-row items-center">
           <div className={`${loading ? 'flex items-center' : 'hidden'} mr-2`}>
@@ -109,11 +104,11 @@ export default function ChatHeader() {
 
           <button
             onClick={openModelDropdown}
-            className="flex flex-row text-black hover:opacity-80 items-center gap-1 p-2"
+            className="flex flex-row items-center gap-1 p-2 text-black hover:opacity-80"
           >
-            <span className="font-semibold text-lg">{selectedModel}</span>
+            <span className="text-lg font-semibold">{selectedModel}</span>
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -129,16 +124,16 @@ export default function ChatHeader() {
           </button>
         </div>
         {modelDropdownOpen && (
-          <div className="absolute top-full right-0 w-40 rounded-md shadow-lg z-10 bg-gray-100">
+          <div className="absolute right-0 top-full z-10 w-40 rounded-md bg-gray-100 shadow-lg">
             {availableModels &&
               availableModels.models.map((model, index) => (
                 <button
                   key={index}
                   onClick={() => selectModel(model.name)}
-                  className="flex items-center w-full text-left px-4 py-2 text-sm text-secondaryColor hover:bg-gray-200 hover:rounded-md"
+                  className="flex w-full items-center px-4 py-2 text-left text-sm text-secondaryColor hover:rounded-md hover:bg-gray-200"
                 >
                   {activeModels.includes(model.name) && (
-                    <div className="mr-2 h-2 w-2 bg-green-500 rounded-full"></div>
+                    <div className="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
                   )}
                   <span
                     className={`flex-1 truncate ${selectedModel === model.name ? 'font-semibold' : ''}`}

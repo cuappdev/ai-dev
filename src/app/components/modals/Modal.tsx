@@ -36,16 +36,13 @@ export default function Modal({ onClose, children }: ModalProps) {
   });
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-      <div
-        ref={modalRef}
-        className="bg-white border rounded-lg w-11/12 max-w-xl p-8 relative"
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <div ref={modalRef} className="relative w-11/12 max-w-xl rounded-lg border bg-white p-8">
         <button
-          onClick={() => {if (!loading) onClose()}}
-          className={`absolute top-2 right-2 text-gray-700 hover:text-gray-400
-            transition-colors duration-300 ${loading ? 'hidden' : 'block'}`
-          }
+          onClick={() => {
+            if (!loading) onClose();
+          }}
+          className={`absolute right-2 top-2 text-gray-700 transition-colors duration-300 hover:text-gray-400 ${loading ? 'hidden' : 'block'}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -55,11 +52,7 @@ export default function Modal({ onClose, children }: ModalProps) {
             stroke="currentColor"
             className="size-6"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
         {childrenWithProps}

@@ -16,10 +16,7 @@ interface ChatHistoryNavbarProps {
   isNavbarOpen: boolean;
 }
 
-export default function ChatHistoryNavbar({
-  toggleNavbar,
-  isNavbarOpen,
-}: ChatHistoryNavbarProps) {
+export default function ChatHistoryNavbar({ toggleNavbar, isNavbarOpen }: ChatHistoryNavbarProps) {
   const { user, signOut } = useAuth();
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [isModelModalOpen, setIsModelModalOpen] = useState(false);
@@ -38,14 +35,11 @@ export default function ChatHistoryNavbar({
   }, []);
 
   return (
-    <div className="h-full flex flex-col justify-between">
-      <div className="flex flex-col mt-4 w-11/12 m-auto text-sm">
-        <div className="flex align-middle justify-between">
+    <div className="flex h-full flex-col justify-between">
+      <div className="m-auto mt-4 flex w-11/12 flex-col text-sm">
+        <div className="flex justify-between align-middle">
           <div>
-            <button
-              onClick={toggleNavbar}
-              className="text-white p-2 hover:opacity-80"
-            >
+            <button onClick={toggleNavbar} className="p-2 text-white hover:opacity-80">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -66,14 +60,26 @@ export default function ChatHistoryNavbar({
           <div className="flex gap-3">
             <button
               onClick={() => setIsEmbedModalOpen(true)}
-              className='text-white hover:opacity-80 p-2'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-                </svg>
+              className="p-2 text-white hover:opacity-80"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
+                />
+              </svg>
             </button>
             <button
               onClick={() => setIsModelModalOpen(true)}
-              className="text-white hover:opacity-80 p-2"
+              className="p-2 text-white hover:opacity-80"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -90,10 +96,7 @@ export default function ChatHistoryNavbar({
                 />
               </svg>
             </button>
-            <button
-              onClick={() => router.push('/')}
-              className="text-white hover:opacity-80 p-2"
-            >
+            <button onClick={() => router.push('/')} className="p-2 text-white hover:opacity-80">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -102,11 +105,7 @@ export default function ChatHistoryNavbar({
                 stroke="currentColor"
                 className="size-6"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4.5v15m7.5-7.5h-15"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </button>
           </div>
@@ -115,17 +114,17 @@ export default function ChatHistoryNavbar({
 
       {isNavbarOpen &&
         (loadingHistory ? (
-          <div className="flex-1 flex align-middle items-center justify-center">
-            <Spinner width='5' height='5' />
+          <div className="flex flex-1 items-center justify-center align-middle">
+            <Spinner width="5" height="5" />
           </div>
         ) : (
           <ChatHistory chats={chatHistory.chats} />
         ))}
 
       {isNavbarOpen && (
-        <div className="text-stone-300 gap-5 p-5 flex flex-col">
+        <div className="flex flex-col gap-5 p-5 text-stone-300">
           <div className="w-full">
-            <button className="flex items-center gap-2 cursor-default">
+            <button className="flex cursor-default items-center gap-2">
               <Image
                 className="rounded-full"
                 src={user!.photoURL!}
@@ -167,10 +166,7 @@ export default function ChatHistoryNavbar({
           <div className="h-px bg-slate-500"></div>
 
           <div className="w-full">
-            <button
-              onClick={signOut}
-              className="flex items-center gap-2 hover:opacity-80"
-            >
+            <button onClick={signOut} className="flex items-center gap-2 hover:opacity-80">
               <svg
                 width="24"
                 height="24"

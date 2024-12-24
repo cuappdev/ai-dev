@@ -30,9 +30,7 @@ export default function ModelInfoModal() {
     fetchData();
   }, [selectedModel]);
 
-  const printModelData = (
-    modelData: ModelInfoResponse
-  ): (JSX.Element | string)[] => {
+  const printModelData = (modelData: ModelInfoResponse): (JSX.Element | string)[] => {
     if (!modelData) {
       return [];
     }
@@ -40,8 +38,7 @@ export default function ModelInfoModal() {
       if (typeof value === 'object') {
         return (
           <div key={key}>
-            <span className="font-semibold">{key}</span>:{' '}
-            {printModelData(value)}
+            <span className="font-semibold">{key}</span>: {printModelData(value)}
           </div>
         );
       } else {
@@ -55,16 +52,14 @@ export default function ModelInfoModal() {
   };
 
   if (loading) {
-    return <Spinner width='4' height='4' />;
+    return <Spinner width="4" height="4" />;
   }
 
   return (
     <>
-      <span className="font-semibold text-3xl">{selectedModel} Info</span>
+      <span className="text-3xl font-semibold">{selectedModel} Info</span>
       {modelData ? <h2>{modelData.model}</h2> : <h2>No model data</h2>}
-      <pre className="max-h-72 overflow-y-auto mt-2">
-        {modelData && printModelData(modelData)}
-      </pre>
+      <pre className="mt-2 max-h-72 overflow-y-auto">{modelData && printModelData(modelData)}</pre>
       {error && <span className="text-red-500">{error}</span>}
     </>
   );

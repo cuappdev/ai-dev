@@ -6,7 +6,7 @@ export default function LoginPage() {
   const { signInWithGoogle, error } = useAuth();
 
   return (
-    <main className="flex flex-col items-center justify-center gap-10 h-svh">
+    <main className="flex h-svh flex-col items-center justify-center gap-10">
       <div>
         <svg
           width="66"
@@ -24,18 +24,16 @@ export default function LoginPage() {
         </svg>
       </div>
 
-      <div className="rounded-lg border border-neutral-200 text-neutral-950 shadow-sm w-[380px] py-5 max-[900px]:mt-10 max-[400px]:w-[95%]">
+      <div className="w-[380px] rounded-lg border border-neutral-200 py-5 text-neutral-950 shadow-sm max-[900px]:mt-10 max-[400px]:w-[95%]">
         <div className="flex flex-col space-y-1.5 p-6">
           <h3 className="text-2xl font-semibold">Welcome to AI Dev!</h3>
-          <p className="text-sm text-secondaryColor">
-            Login with your Cornell email account
-          </p>
+          <p className="text-sm text-secondaryColor">Login with your Cornell email account</p>
         </div>
 
         <div className="flex items-center p-6 pt-0">
           <button
             onClick={signInWithGoogle}
-            className="flex gap-2 items-center justify-center h-10 px-4 py-2 w-full text-white bg-primaryColor rounded-md text-sm font-medium hover:opacity-80"
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primaryColor px-4 py-2 text-sm font-medium text-white hover:opacity-80"
           >
             <svg
               height="20"
@@ -65,7 +63,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {error && <div className="pl-6 text-red-600 text-sm">{error}</div>}
+        {error && <div className="pl-6 text-sm text-red-600">{error}</div>}
       </div>
     </main>
   );

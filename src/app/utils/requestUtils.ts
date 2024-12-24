@@ -25,13 +25,13 @@ export async function cloneRequest(request: NextRequest, url: string) {
   const init: RequestInit = await createClonedRequest(request);
 
   try {
-    const clonedResponse = await fetch(
-      `${process.env.OLLAMA_ENDPOINT}${url}`,
-      init
-    );
+    const clonedResponse = await fetch(`${process.env.OLLAMA_ENDPOINT}${url}`, init);
 
     if (!clonedResponse.ok || !clonedResponse.body) {
-      return NextResponse.json({ error: `Ollama error: ${clonedResponse.statusText}` }, { status: clonedResponse.status });
+      return NextResponse.json(
+        { error: `Ollama error: ${clonedResponse.statusText}` },
+        { status: clonedResponse.status },
+      );
     }
 
     const headers = new Headers(clonedResponse.headers);

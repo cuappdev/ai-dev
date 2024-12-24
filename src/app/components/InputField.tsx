@@ -6,10 +6,7 @@ interface InputFieldProps {
   messageStreaming: boolean;
 }
 
-export default function InputField({
-  onSubmit,
-  messageStreaming,
-}: InputFieldProps) {
+export default function InputField({ onSubmit, messageStreaming }: InputFieldProps) {
   const { selectedModel } = useModel();
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -49,7 +46,7 @@ export default function InputField({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-4/6 m-auto items-center border border-secondaryColor rounded-lg px-4 py-2 bg-white shadow-sm"
+      className="m-auto flex w-4/6 items-center rounded-lg border border-secondaryColor bg-white px-4 py-2 shadow-sm"
     >
       {/* // TODO: Implement file upload */}
       {/* <button className="mr-3">
@@ -65,7 +62,7 @@ export default function InputField({
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder={`Message ${selectedModel}`}
-        className="flex-1 max-h-[150px] overflow-hidden border-none outline-none text-gray-700 placeholder-gray-400 resize-none"
+        className="max-h-[150px] flex-1 resize-none overflow-hidden border-none text-gray-700 placeholder-gray-400 outline-none"
         rows={1}
       />
 

@@ -41,7 +41,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
     setSuccess(null);
     setError(null);
     setLogs([]);
-  }
+  };
 
   const handleTabChange = (tab: TabOption) => {
     if (loading) return;
@@ -50,9 +50,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
   };
 
   // TODO: Fix stream request
-  const sendStreamedRequest = async (
-    body: CreateModelRequest | PullModelRequest,
-  ) => {
+  const sendStreamedRequest = async (body: CreateModelRequest | PullModelRequest) => {
     setLoading(true);
     clearValues();
     try {
@@ -85,8 +83,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
         for (const line of lines) {
           if (line.trim()) {
             try {
-              const response: CreateModelResponse | PullModelResponse =
-                JSON.parse(line);
+              const response: CreateModelResponse | PullModelResponse = JSON.parse(line);
               setLogs((prevLogs) => [...prevLogs, response.status]);
 
               if (response.status === 'success') {
@@ -107,8 +104,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
       // Remaining data in the buffer
       if (buffer.trim()) {
         try {
-          const response: CreateModelResponse | PullModelResponse =
-            JSON.parse(buffer);
+          const response: CreateModelResponse | PullModelResponse = JSON.parse(buffer);
           setLogs((prevLogs) => [...prevLogs, response.status]);
 
           if (response.status === 'success') {
@@ -153,7 +149,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
       }
     } finally {
       setLoading(false);
-    };
+    }
   };
 
   const createModel = async (e: React.FormEvent) => {
@@ -180,7 +176,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
     };
     await sendDeleteRequest(body);
   };
-  
+
   const getSuccessMessage = () => {
     switch (activeTab) {
       case 'create':
@@ -192,7 +188,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
       default:
         return 'Operation successful';
     }
-  }
+  };
 
   const getButtonLabel = () => {
     const getText = () => {
@@ -206,13 +202,13 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
         default:
           return loading ? 'Processing' : 'Submit';
       }
-    }
-    return (loading ?
-      <div className='flex justify-center items-center gap-2'>
-        <Spinner width='1' height='1' />
+    };
+    return loading ? (
+      <div className="flex items-center justify-center gap-2">
+        <Spinner width="1" height="1" />
         {getText()}
       </div>
-      :
+    ) : (
       getText()
     );
   };
@@ -222,11 +218,12 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
       <button
         type="submit"
         disabled={loading}
-        className={`w-full bg-primaryColor text-white py-2 rounded-md hover:opacity-80 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-          {getButtonLabel()}
+        className={`w-full rounded-md bg-primaryColor py-2 text-white hover:opacity-80 ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+      >
+        {getButtonLabel()}
       </button>
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -236,13 +233,11 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
             <button
               key={option.value}
               onClick={() => handleTabChange(option.value)}
-              className={`py-2 px-4
-                ${activeTab === option.value
+              className={`px-4 py-2 ${
+                activeTab === option.value
                   ? 'border-b-2 border-primaryColor text-primaryColor'
                   : 'text-gray-500 dark:text-gray-300'
-                }
-                ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`
-              }
+              } ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
               {option.label}
             </button>
@@ -253,24 +248,24 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
       <div>
         {activeTab === 'create' && (
           <div>
-            <h2 className="text-xl font-semibold mb-2">Create a New Model</h2>
+            <h2 className="mb-2 text-xl font-semibold">Create a New Model</h2>
             <form onSubmit={createModel}>
               <div className="mb-4">
-                <label className="block mb-2">Model Name</label>
+                <label className="mb-2 block">Model Name</label>
                 <input
                   type="text"
                   autoFocus
                   ref={createModelNameRef}
                   required
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none"
+                  className="w-full rounded-md border px-3 py-2 focus:outline-none"
                 />
               </div>
               <div className="mb-4">
-                <label className="block mb-2">Modelfile</label>
+                <label className="mb-2 block">Modelfile</label>
                 <textarea
                   ref={createModelfileRef}
                   required
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none"
+                  className="w-full rounded-md border px-3 py-2 focus:outline-none"
                 ></textarea>
               </div>
               {createSubmitButton()}
@@ -280,16 +275,16 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
 
         {activeTab === 'pull' && (
           <div>
-            <h2 className="text-xl font-semibold mb-2">Pull Model</h2>
+            <h2 className="mb-2 text-xl font-semibold">Pull Model</h2>
             <form onSubmit={pullModel}>
               <div className="mb-4">
-                <label className="block mb-2">Model Name</label>
+                <label className="mb-2 block">Model Name</label>
                 <input
                   type="text"
                   autoFocus
                   ref={pullModelNameRef}
                   required
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none"
+                  className="w-full rounded-md border px-3 py-2 focus:outline-none"
                 />
               </div>
               {createSubmitButton()}
@@ -299,16 +294,16 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
 
         {activeTab === 'delete' && (
           <div>
-            <h2 className="text-xl font-semibold mb-2">Delete Model</h2>
+            <h2 className="mb-2 text-xl font-semibold">Delete Model</h2>
             <form onSubmit={deleteModel}>
               <div className="mb-4">
-                <label className="block mb-2">Model Name</label>
+                <label className="mb-2 block">Model Name</label>
                 <input
                   type="text"
                   autoFocus
                   ref={deleteModelNameRef}
                   required
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none"
+                  className="w-full rounded-md border px-3 py-2 focus:outline-none"
                 />
               </div>
               {createSubmitButton()}
@@ -317,8 +312,8 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
         )}
 
         {logs.length > 0 && (
-          <div className="mt-4 bg-black text-white font-mono p-4 rounded-md overflow-y-auto max-h-60">
-            <h3 className="text-lg font-semibold mb-2">Logs</h3>
+          <div className="mt-4 max-h-60 overflow-y-auto rounded-md bg-black p-4 font-mono text-white">
+            <h3 className="mb-2 text-lg font-semibold">Logs</h3>
             <ul className="list-none space-y-1">
               {logs.map((log, index) => (
                 <li key={index}>{log}</li>
@@ -329,13 +324,13 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
 
         {success && (
           <div className="mt-4">
-            <p className="text-green-500 text-sm">{success}</p>
+            <p className="text-sm text-green-500">{success}</p>
           </div>
         )}
 
         {error && (
           <div className="mt-4">
-            <p className="text-red-500 text-sm">{error}</p>
+            <p className="text-sm text-red-500">{error}</p>
           </div>
         )}
       </div>

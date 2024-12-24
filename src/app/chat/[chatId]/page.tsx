@@ -4,11 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModel } from '@/contexts/ModelContext';
 import { usePathname } from 'next/navigation';
-import {
-  ChatCompletionRequest,
-  ChatStreamCompletionResponse,
-  Message,
-} from '@/types/chat';
+import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from '@/types/chat';
 import Protected from '@/app/components/Protected';
 import ChatHistoryNavbar from '@/app/components/chatHistory/ChatHistoryNavbar';
 import ChatHeader from '@/app/components/chat/ChatHeader';
@@ -37,7 +33,7 @@ export default function ChatPage() {
     if (window.innerWidth > 768) {
       setIsNavbarOpen(true);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -75,7 +71,7 @@ export default function ChatPage() {
       setMessageStreaming(false);
     }
   };
-  
+
   const fetchChatResponse = async (body: ChatCompletionRequest) => {
     const response = await fetch(`/api/models`, {
       method: 'POST',
@@ -84,28 +80,28 @@ export default function ChatPage() {
       },
       body: JSON.stringify(body),
     });
-  
+
     if (!response.ok || !response.body) {
       const data = await response.json();
       throw new Error(data.error || 'Failed to send message.');
     }
-  
+
     return response.body.getReader();
   };
-  
+
   const processStreamedResponse = async (reader: ReadableStreamDefaultReader) => {
     const decoder = new TextDecoder('utf-8');
     let buffer = '';
     let done = false;
-  
+
     while (!done) {
       const { value, done: streamDone } = await reader.read();
       done = streamDone;
       buffer += decoder.decode(value, { stream: true });
-  
+
       const lines = buffer.split(/\r?\n/);
       buffer = lines.pop() || '';
-  
+
       for (const line of lines) {
         if (line.trim()) {
           try {
@@ -122,7 +118,7 @@ export default function ChatPage() {
         }
       }
     }
-  
+
     if (buffer.trim()) {
       try {
         const response: ChatStreamCompletionResponse = JSON.parse(buffer);
@@ -132,7 +128,7 @@ export default function ChatPage() {
       }
     }
   };
-  
+
   const updateMessages = (response: ChatStreamCompletionResponse) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
@@ -158,7 +154,7 @@ export default function ChatPage() {
       }
     });
   };
-  
+
   const displayError = (error: unknown) => {
     if (error instanceof Error) {
       const errorMessage = {
@@ -188,20 +184,16 @@ export default function ChatPage() {
 
   return (
     <Protected>
-      <div className="flex flex-row gap-0 w-full h-svh">
+      <div className="flex h-svh w-full flex-row gap-0">
         <div
-          className={`bg-black transition-all duration-300 flex-shrink-0 overflow-y-auto ${isNavbarOpen ? 'w-64' : 'w-0'}`}
+          className={`flex-shrink-0 overflow-y-auto bg-black transition-all duration-300 ${isNavbarOpen ? 'w-64' : 'w-0'}`}
         >
-          <ChatHistoryNavbar
-            toggleNavbar={toggleNavbar}
-            isNavbarOpen={isNavbarOpen}
-          />
+          <ChatHistoryNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
         </div>
 
         <button
           onClick={toggleNavbar}
-          className={`fixed top-4 left-8 transform -translate-x-1/2 p-2 transition-colors duration-300
-          ${isNavbarOpen ? 'hidden' : 'block'}`}
+          className={`fixed left-8 top-4 -translate-x-1/2 transform p-2 transition-colors duration-300 ${isNavbarOpen ? 'hidden' : 'block'}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -219,10 +211,10 @@ export default function ChatPage() {
           </svg>
         </button>
 
-        <div className="w-full flex flex-col">
+        <div className="flex w-full flex-col">
           <ChatHeader />
 
-          <div className="w-4/5 flex flex-grow flex-col gap-3 m-auto mt-5 mb-10 overflow-y-scroll no-scrollbar">
+          <div className="no-scrollbar m-auto mb-10 mt-5 flex w-4/5 flex-grow flex-col gap-3 overflow-y-scroll">
             {messages.map((message, index) => (
               <ChatMessage key={index} message={message} />
             ))}
@@ -230,10 +222,7 @@ export default function ChatPage() {
           </div>
 
           <div className="mb-10">
-            <InputField
-              onSubmit={processSubmit}
-              messageStreaming={messageStreaming}
-            />
+            <InputField onSubmit={processSubmit} messageStreaming={messageStreaming} />
           </div>
         </div>
       </div>

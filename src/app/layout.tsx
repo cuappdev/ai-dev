@@ -7,9 +7,7 @@ export const metadata: Metadata = {
   title: 'AI Dev',
   description:
     "Cornell AppDev's internal AI tool and platform enabling AI features and interactions with a finetuned organizational model.",
-  authors: [
-    { name: 'Aayush Agnihotri', url: 'https://www.cornellappdev.com/' },
-  ],
+  authors: [{ name: 'Aayush Agnihotri', url: 'https://www.cornellappdev.com/' }],
   keywords: [
     'Cornell AppDev',
     'AI Dev',
@@ -23,9 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>

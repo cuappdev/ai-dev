@@ -27,18 +27,14 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div className="flex flex-row gap-2">
       <Image
-        src={
-          message.sender === user!.displayName ? user!.photoURL! : `/ollama.png`
-        }
+        src={message.sender === user!.displayName ? user!.photoURL! : `/ollama.png`}
         width={40}
         height={40}
         alt={message.sender}
-        className="rounded-full w-10 h-10 object-cover flex-shrink-0"
+        className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
       />
       <div className="flex flex-col overflow-auto">
-        <span className="font-semibold text-lg">
-          {message.sender.split(' ')[0]}
-        </span>
+        <span className="text-lg font-semibold">{message.sender.split(' ')[0]}</span>
         <div className="flex flex-row gap-1">
           <span className="text-xs text-gray-400">{message.timestamp}</span>
           {copied ? (
@@ -50,11 +46,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               stroke="currentColor"
               className="size-4 text-green-400"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m4.5 12.75 6 6 9-13.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           ) : (
             <svg
@@ -64,7 +56,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="size-4 text-gray-400 hover:text-gray-500 hover:cursor-pointer"
+              className="size-4 text-gray-400 hover:cursor-pointer hover:text-gray-500"
             >
               <path
                 strokeLinecap="round"
@@ -89,12 +81,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             }) {
               const match = /language-(\w+)/.exec(className || '');
               return !inline && match ? (
-                <SyntaxHighlighter
-                  style={materialDark}
-                  language={match[1]}
-                  PreTag="div"
-                  {...props}
-                >
+                <SyntaxHighlighter style={materialDark} language={match[1]} PreTag="div" {...props}>
                   {String(children).replace(/\n$/, '')}
                 </SyntaxHighlighter>
               ) : (

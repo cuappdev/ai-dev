@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
   signInWithPopup,
   signOut as firebaseSignOut,
@@ -15,7 +9,6 @@ import {
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { auth, provider } from '@/firebase';
-
 
 interface AuthContextType {
   user: User | null;
@@ -58,12 +51,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async () => {
     setError(null);
-    await signInWithPopup(auth, provider)
-      .catch((error) => {
-        // TODO: Add toast to tell user there is an error
-        setError((error as FirebaseAuthError).message);
-      }
-    );
+    await signInWithPopup(auth, provider).catch((error) => {
+      // TODO: Add toast to tell user there is an error
+      setError((error as FirebaseAuthError).message);
+    });
   };
 
   const signOut = async () => {
@@ -71,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await firebaseSignOut(auth)
       .then(async () => {
         router.push('/');
-        await fetch("/api/logout");
+        await fetch('/api/logout');
       })
       .catch((error) => {
         // TODO: Add toast to tell user there is an error
@@ -85,15 +76,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setLoading(false);
         return;
-      };
-      
+      }
+
       try {
         const token = await currentUser.getIdToken();
         // Validate firebase token
         const firebaseMiddlewareResponse = await fetch('/api/login', {
           headers: {
             Authorization: `Bearer ${token}`,
-          }
+          },
         });
         if (!firebaseMiddlewareResponse.ok) {
           await signOut();
@@ -101,12 +92,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         // Ensure user is in the database
-        const userResponse  = await fetch('/api/authenticate');
+        const userResponse = await fetch('/api/authenticate');
         if (!userResponse.ok) {
           await signOut();
           throw new Error(await userResponse.text());
         }
-        
+
         setUser(currentUser);
       } catch (error) {
         // TODO: Add toast to tell user there is an error
@@ -114,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
       } finally {
         setLoading(false);
-      };
+      }
     });
     return () => authChange();
   });
