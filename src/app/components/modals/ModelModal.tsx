@@ -5,8 +5,10 @@ import {
   PullModelRequest,
   PullModelResponse,
 } from '@/types/model';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Spinner from '../Spinner';
+import { toast } from 'react-toastify';
+import Toast from '../Toast';
 
 interface ModelModalProps {
   loading: boolean;
@@ -37,6 +39,18 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
   const pullModelNameRef = useRef<HTMLInputElement>(null);
   const deleteModelNameRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success(success);
+    }
+  }, [success]);
+
   const clearValues = () => {
     setSuccess(null);
     setError(null);
@@ -49,79 +63,88 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
     clearValues();
   };
 
-  // TODO: Fix stream request
   const sendStreamedRequest = async (body: CreateModelRequest | PullModelRequest) => {
     setLoading(true);
     clearValues();
     try {
-      const initialResponse = await fetch(`/api/models/${activeTab}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
+      const initialResponse = await fetchRequest(body);
+      const reader = initialResponse.body?.getReader();
+      if (!reader) throw new Error('Failed to get reader from response body');
 
-      if (!initialResponse.ok || !initialResponse.body) {
-        const data = await initialResponse.json();
-        throw new Error(data.error || `Failed to ${activeTab} the model.`);
-      }
-
-      const reader = initialResponse.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
-      let done = false;
-
-      while (!done) {
-        const { value, done: streamDone } = await reader.read();
-        done = streamDone;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              const response: CreateModelResponse | PullModelResponse = JSON.parse(line);
-              setLogs((prevLogs) => [...prevLogs, response.status]);
-
-              if (response.status === 'success') {
-                setSuccess(getSuccessMessage());
-                done = true;
-                break;
-              }
-            } catch (parseError: unknown) {
-              if (parseError instanceof Error) {
-                setError(parseError.message);
-                done = true;
-              }
-            }
-          }
-        }
-      }
-
-      // Remaining data in the buffer
-      if (buffer.trim()) {
-        try {
-          const response: CreateModelResponse | PullModelResponse = JSON.parse(buffer);
-          setLogs((prevLogs) => [...prevLogs, response.status]);
-
-          if (response.status === 'success') {
-            setSuccess(getSuccessMessage());
-          }
-        } catch (parseError: unknown) {
-          if (parseError instanceof Error) {
-            setError(parseError.message);
-          }
-        }
-      }
+      await processStream(reader);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-      }
+      handleError(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRequest = async (body: CreateModelRequest | PullModelRequest) => {
+    const response = await fetch(`/api/models/${activeTab}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok || !response.body) {
+      const data = await response.json();
+      throw new Error(data.error || `Failed to ${activeTab} the model`);
+    }
+
+    return response;
+  };
+
+  const processStream = async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let done = false;
+
+    while (!done) {
+      const { value, done: streamDone } = await reader.read();
+      done = streamDone;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.trim()) {
+          try {
+            const response: CreateModelResponse | PullModelResponse = JSON.parse(line);
+            setLogs((prevLogs) => [...prevLogs, response.status]);
+
+            if (response.status === 'success') {
+              setSuccess(getSuccessMessage());
+              done = true;
+              break;
+            }
+          } catch (parseError: unknown) {
+            handleError(parseError);
+            done = true;
+          }
+        }
+      }
+    }
+
+    if (buffer.trim()) {
+      try {
+        const response: CreateModelResponse | PullModelResponse = JSON.parse(buffer);
+        setLogs((prevLogs) => [...prevLogs, response.status]);
+
+        if (response.status === 'success') {
+          setSuccess(getSuccessMessage());
+        }
+      } catch (parseError: unknown) {
+        handleError(parseError);
+      }
+    }
+  };
+
+  const handleError = (error: unknown) => {
+    if (error instanceof Error) {
+      setError(error.message);
     }
   };
 
@@ -194,13 +217,13 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
     const getText = () => {
       switch (activeTab) {
         case 'create':
-          return loading ? 'Creating' : 'Create Model';
+          return loading ? 'Creating...' : 'Create Model';
         case 'pull':
-          return loading ? 'Pulling' : 'Pull Model';
+          return loading ? 'Pulling...' : 'Pull Model';
         case 'delete':
-          return loading ? 'Deleting' : 'Delete Model';
+          return loading ? 'Deleting...' : 'Delete Model';
         default:
-          return loading ? 'Processing' : 'Submit';
+          return loading ? 'Processing...' : 'Submit';
       }
     };
     return loading ? (
@@ -321,18 +344,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
             </ul>
           </div>
         )}
-
-        {success && (
-          <div className="mt-4">
-            <p className="text-sm text-green-500">{success}</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-4">
-            <p className="text-sm text-red-500">{error}</p>
-          </div>
-        )}
+        <Toast />
       </div>
     </>
   );

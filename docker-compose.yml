@@ -17,6 +17,3 @@ services:
 
 networks:
   app-network:
-    #  TODO: Delete
-    # driver: overlay
-    # attachable: true

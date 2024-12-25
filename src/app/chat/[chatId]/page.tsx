@@ -160,7 +160,7 @@ export default function ChatPage() {
       const errorMessage = {
         id: `${messages.length + 1}`,
         chatId: chatId,
-        content: `The following error occurred while processing your request:\n${error.message}\nPlease try again.`,
+        content: `${error.message} - Please try again.`,
         timestamp: new Date().toLocaleString(),
         sender: selectedModel,
       };
