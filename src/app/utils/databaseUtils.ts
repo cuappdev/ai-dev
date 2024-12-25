@@ -1,5 +1,4 @@
 import prisma from '@/prisma';
-import { Email } from '@prisma/client';
 
 export async function createEmail(email: string) {
   return await prisma.email.create({

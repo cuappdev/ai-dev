@@ -1,9 +1,18 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
+import Toast from './Toast';
 
 export default function LoginPage() {
   const { signInWithGoogle, error } = useAuth();
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <main className="flex h-svh flex-col items-center justify-center gap-10">
@@ -62,8 +71,7 @@ export default function LoginPage() {
             <span>Login</span>
           </button>
         </div>
-
-        {error && <div className="pl-6 text-sm text-red-600">{error}</div>}
+        <Toast />
       </div>
     </main>
   );

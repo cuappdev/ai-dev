@@ -52,6 +52,6 @@ export async function cloneRequest(request: NextRequest, url: string) {
       status: clonedResponse.status,
     });
   } catch (error) {
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json({ message: error }, { status: 500 });
   }
 }

@@ -13,22 +13,14 @@ import { auth, provider } from '@/firebase';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  // TODO: Remove once there is a toast
   error: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
-interface FirebaseAuthError {
-  code: string;
-  message: string;
-  name: string;
-}
-
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  // TODO: Remove once there is a toast
   error: null,
   signInWithGoogle: async () => {},
   signOut: async () => {},
@@ -45,15 +37,13 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  // TODO: Remove once there is a toast
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const signInWithGoogle = async () => {
     setError(null);
     await signInWithPopup(auth, provider).catch((error) => {
-      // TODO: Add toast to tell user there is an error
-      setError((error as FirebaseAuthError).message);
+      setError((error as Error).message);
     });
   };
 
@@ -65,8 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await fetch('/api/logout');
       })
       .catch((error) => {
-        // TODO: Add toast to tell user there is an error
-        setError((error as FirebaseAuthError).message);
+        setError((error as Error).message);
       });
   };
 
@@ -100,7 +89,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setUser(currentUser);
       } catch (error) {
-        // TODO: Add toast to tell user there is an error
         setError(JSON.parse((error as Error).message).message);
         setUser(null);
       } finally {
@@ -111,10 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   return (
-    <AuthContext.Provider
-      // TODO: Remove once there is a toast
-      value={{ user, loading, error, signInWithGoogle, signOut }}
-    >
+    <AuthContext.Provider value={{ user, loading, error, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
