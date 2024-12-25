@@ -4,19 +4,19 @@ import { ChatHistory as History } from '@/types/chat';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Spinner from '../Spinner';
-import ChatHistory from './ChatHistory';
 import ModelModal from '../modals/ModelModal';
 import EmbedModal from '../modals/EmbedModal';
 import Modal from '../modals/Modal';
+import ChatMenu from './chatMenu';
 
 // TODO: Fetch chat history from the server
 
-interface ChatHistoryNavbarProps {
+interface ChatMenuNavbarProps {
   toggleNavbar: () => void;
   isNavbarOpen: boolean;
 }
 
-export default function ChatHistoryNavbar({ toggleNavbar, isNavbarOpen }: ChatHistoryNavbarProps) {
+export default function ChatMenuNavbar({ toggleNavbar, isNavbarOpen }: ChatMenuNavbarProps) {
   const { user, signOut } = useAuth();
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [isModelModalOpen, setIsModelModalOpen] = useState(false);
@@ -118,7 +118,7 @@ export default function ChatHistoryNavbar({ toggleNavbar, isNavbarOpen }: ChatHi
             <Spinner width="5" height="5" />
           </div>
         ) : (
-          <ChatHistory chats={chatHistory.chats} />
+          <ChatMenu chats={chatHistory.chats} />
         ))}
 
       {isNavbarOpen && (

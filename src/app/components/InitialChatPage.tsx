@@ -1,6 +1,6 @@
 'use client';
 
-import ChatHistoryNavbar from '@/app/components/chatHistory/ChatHistoryNavbar';
+import ChatMenuNavbar from './chatMenu/chatMenuNavbar';
 import ChatHeader from './chat/ChatHeader';
 import InputField from './InputField';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,7 +31,7 @@ export default function InitialChatPage() {
       <div
         className={`flex-shrink-0 overscroll-none bg-black transition-all duration-300 ${isNavbarOpen ? 'w-64' : 'w-0'}`}
       >
-        <ChatHistoryNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
+        <ChatMenuNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
       </div>
 
       <button

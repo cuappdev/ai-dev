@@ -6,7 +6,7 @@ import { useModel } from '@/contexts/ModelContext';
 import { usePathname } from 'next/navigation';
 import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from '@/types/chat';
 import Protected from '@/app/components/Protected';
-import ChatHistoryNavbar from '@/app/components/chatHistory/ChatHistoryNavbar';
+import ChatMenuNavbar from '@/app/components/chatMenu/chatMenuNavbar';
 import ChatHeader from '@/app/components/chat/ChatHeader';
 import InputField from '@/app/components/InputField';
 import ChatMessage from '@/app/components/chat/ChatMessage';
@@ -132,7 +132,7 @@ export default function ChatPage() {
   const updateMessages = (response: ChatStreamCompletionResponse) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
-      if (lastMessage && lastMessage.sender !== user!.displayName!) {
+      if (lastMessage && lastMessage.sender !== 'user') {
         return [
           ...prevMessages.slice(0, -1),
           {
@@ -174,7 +174,7 @@ export default function ChatPage() {
       chatId: chatId,
       content: message,
       timestamp: new Date().toLocaleString(),
-      sender: user!.displayName!,
+      sender: 'user',
     };
 
     setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -188,7 +188,7 @@ export default function ChatPage() {
         <div
           className={`flex-shrink-0 overflow-y-auto bg-black transition-all duration-300 ${isNavbarOpen ? 'w-64' : 'w-0'}`}
         >
-          <ChatHistoryNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
+          <ChatMenuNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
         </div>
 
         <button

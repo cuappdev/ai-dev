@@ -1,6 +1,6 @@
 import { ChatHistory as History } from '@/types/chat';
 
-export default function ChatHistory({ chats }: History) {
+export default function ChatMenu({ chats }: History) {
   return (
     <>
       {chats.length > 0 ? (

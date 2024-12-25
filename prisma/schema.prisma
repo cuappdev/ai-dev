@@ -35,14 +35,7 @@ model Message {
   content   String
   images    String[]
   timestamp DateTime @default(now())
-  sender    Sender
+  sender    String
   chat      Chat     @relation(fields: [chatId], references: [uuid])
   chatId    String
-}
-
-enum Sender {
-  USER
-  ASSISTANT
-  SYSTEM
-  TOOL
 }

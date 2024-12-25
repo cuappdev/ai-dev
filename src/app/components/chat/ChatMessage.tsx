@@ -24,17 +24,43 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     }, 1000);
   };
 
+  const getName = () => {
+    if (message.sender === 'user') {
+      return user!.displayName!.split(' ')[0];
+    }
+    return message.sender;
+  };
+
+  const getImage = () => {
+    const lowercaseSender = message.sender.toLowerCase();
+    if (lowercaseSender.includes('user')) {
+      return user!.photoURL!;
+    } else if (lowercaseSender.includes('eatery')) {
+      return '/eatery.png';
+    } else if (lowercaseSender.includes('resell')) {
+      return '/resell.png';
+    } else if (lowercaseSender.includes('transit')) {
+      return '/transit.png';
+    } else if (lowercaseSender.includes('uplift')) {
+      return '/uplift.png';
+    } else if (lowercaseSender.includes('mario')) {
+      return '/mario.png';
+    } else {
+      return '/ollama.png';
+    }
+  };
+
   return (
     <div className="flex flex-row gap-2">
       <Image
-        src={message.sender === user!.displayName ? user!.photoURL! : `/ollama.png`}
+        src={getImage()}
         width={40}
         height={40}
         alt={message.sender}
         className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
       />
       <div className="flex flex-col overflow-auto">
-        <span className="text-lg font-semibold">{message.sender.split(' ')[0]}</span>
+        <span className="text-lg font-semibold">{getName()}</span>
         <div className="flex flex-row gap-1">
           <span className="text-xs text-gray-400">{message.timestamp}</span>
           {copied ? (
@@ -67,6 +93,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           )}
         </div>
         <ReactMarkdown
+          className={'whitespace-pre-line'}
           remarkPlugins={[remarkGfm]}
           components={{
             code({

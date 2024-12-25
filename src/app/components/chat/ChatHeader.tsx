@@ -5,6 +5,8 @@ import Modal from '../modals/Modal';
 import ModelInfoModal from '../modals/ModelInfoModal';
 import Spinner from '../Spinner';
 
+// TODO: Add extra dropdown to set model temperature, etc
+
 export default function ChatHeader() {
   const { selectedModel, setSelectedModel } = useModel();
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
