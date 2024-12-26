@@ -11,7 +11,6 @@ export default function ErrorToast() {
       newestOnTop={false}
       closeOnClick={true}
       rtl={false}
-      pauseOnFocusLoss
       pauseOnHover
       theme="colored"
       transition={Slide}
