@@ -1,3 +1,4 @@
+// TODO: Fix 'use client' directives - only put where needed
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';

@@ -6,7 +6,7 @@ import { useModel } from '@/contexts/ModelContext';
 import { usePathname } from 'next/navigation';
 import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from '@/types/chat';
 import Protected from '@/app/components/Protected';
-import ChatMenuNavbar from '@/app/components/chatMenu/chatMenuNavbar';
+import ChatMenuNavbar from '@/app/components/chat/ChatMenuNavbar';
 import ChatHeader from '@/app/components/chat/ChatHeader';
 import InputField from '@/app/components/InputField';
 import ChatMessage from '@/app/components/chat/ChatMessage';
@@ -14,7 +14,6 @@ import ChatMessage from '@/app/components/chat/ChatMessage';
 export default function ChatPage() {
   const { user } = useAuth();
   const { selectedModel } = useModel();
-  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageStreaming, setMessageStreaming] = useState(false);
   const pathname = usePathname();
@@ -24,16 +23,6 @@ export default function ChatPage() {
   // TODO: Change title of page to summary of the chat on each page
   // TODO: Fix navbar toggle and rerendering
   // TODO: Fetch the chat from the server and load it into messages, then send a request to get the response if messages.length == 1
-
-  const toggleNavbar = () => {
-    setIsNavbarOpen(!isNavbarOpen);
-  };
-
-  useEffect(() => {
-    if (window.innerWidth > 768) {
-      setIsNavbarOpen(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -185,31 +174,7 @@ export default function ChatPage() {
   return (
     <Protected>
       <div className="flex h-svh w-full flex-row gap-0">
-        <div
-          className={`flex-shrink-0 overflow-y-auto bg-black transition-all duration-300 ${isNavbarOpen ? 'w-64' : 'w-0'}`}
-        >
-          <ChatMenuNavbar toggleNavbar={toggleNavbar} isNavbarOpen={isNavbarOpen} />
-        </div>
-
-        <button
-          onClick={toggleNavbar}
-          className={`fixed left-8 top-4 -translate-x-1/2 transform p-2 transition-colors duration-300 ${isNavbarOpen ? 'hidden' : 'block'}`}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-6 text-black"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        </button>
+        <ChatMenuNavbar />
 
         <div className="flex w-full flex-col">
           <ChatHeader />
