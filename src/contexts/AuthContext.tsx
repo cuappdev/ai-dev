@@ -67,32 +67,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      try {
-        const token = await currentUser.getIdToken();
-        // Validate firebase token
-        const firebaseMiddlewareResponse = await fetch('/api/login', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!firebaseMiddlewareResponse.ok) {
-          await signOut();
-          throw new Error(await firebaseMiddlewareResponse.text());
-        }
+      if (!user && currentUser) {
+        try {
+          const token = await currentUser.getIdToken();
+          // Validate firebase token
+          const firebaseMiddlewareResponse = await fetch('/api/login', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!firebaseMiddlewareResponse.ok) {
+            await signOut();
+            throw new Error(await firebaseMiddlewareResponse.text());
+          }
 
-        // Ensure user is in the database
-        const userResponse = await fetch('/api/authenticate');
-        if (!userResponse.ok) {
-          await signOut();
-          throw new Error(await userResponse.text());
-        }
+          // Ensure user is in the database
+          const userResponse = await fetch('/api/authenticate');
+          if (!userResponse.ok) {
+            await signOut();
+            throw new Error(await userResponse.text());
+          }
 
-        setUser(currentUser);
-      } catch (error) {
-        setError(JSON.parse((error as Error).message).message);
-        setUser(null);
-      } finally {
-        setLoading(false);
+          setUser(currentUser);
+        } catch (error) {
+          setError(JSON.parse((error as Error).message).message);
+          setUser(null);
+        } finally {
+          setLoading(false);
+        }
       }
     });
     return () => authChange();

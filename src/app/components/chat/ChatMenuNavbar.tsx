@@ -14,9 +14,9 @@ export default function ChatMenuNavbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [isModelModalOpen, setIsModelModalOpen] = useState(false);
-  const router = useRouter();
   const [chatHistory, setChatHistory] = useState<History>({ chats: [] });
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // TODO: Fetch chat history from the server
@@ -41,7 +41,7 @@ export default function ChatMenuNavbar() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  });
+  }, []);
 
   useEffect(() => {
     const fetchChatHistory = async () => {
