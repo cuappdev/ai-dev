@@ -4,7 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModel } from '@/contexts/ModelContext';
 import { usePathname } from 'next/navigation';
-import { ChatCompletionRequest, ChatStreamCompletionResponse, Message } from '@/types/chat';
+import {
+  ChatCompletionRequest,
+  ChatStreamCompletionResponse,
+  FileComponent,
+  Message,
+} from '@/types/chat';
 import Protected from '@/app/components/Protected';
 import ChatMenuNavbar from '@/app/components/chat/ChatMenuNavbar';
 import ChatHeader from '@/app/components/chat/ChatHeader';
@@ -30,7 +35,8 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const createChatCompletionRequestBody = (message: string) => {
+  const createChatCompletionRequestBody = (message: string, files: FileComponent[]) => {
+    console.log(files);
     const body: ChatCompletionRequest = {
       model: selectedModel,
       stream: true,
@@ -38,19 +44,19 @@ export default function ChatPage() {
         ...messages.map((message) => ({
           role: message.sender === user!.displayName ? 'user' : 'assistant',
           content: message.content,
-          images: message.images,
         })),
         {
           role: 'user',
           content: message,
+          images: files.map((file) => file.base64.split(',')[1]),
         },
       ],
     };
     return body;
   };
 
-  const sendStreamedMessage = async (message: string) => {
-    const body = createChatCompletionRequestBody(message);
+  const sendStreamedMessage = async (message: string, files: FileComponent[]) => {
+    const body = createChatCompletionRequestBody(message, files);
     try {
       const reader = await fetchChatResponse(body);
       await processStreamedResponse(reader);
@@ -137,6 +143,7 @@ export default function ChatPage() {
             id: `${messages.length + 1}`,
             chatId: chatId,
             content: response.message!.content,
+            images: response.message!.images,
             timestamp: new Date().toLocaleString(),
             sender: selectedModel,
           },
@@ -158,11 +165,12 @@ export default function ChatPage() {
     }
   };
 
-  const processSubmit = async (message: string) => {
+  const processSubmit = async (message: string, files: FileComponent[]) => {
     const userMessage: Message = {
       id: `${messages.length}`,
       chatId: chatId,
       content: message,
+      images: files.map((file) => file.base64),
       timestamp: new Date().toLocaleString(),
       sender: 'user',
     };
@@ -177,7 +185,7 @@ export default function ChatPage() {
 
     setMessages((prevMessages) => [...prevMessages, userMessage, assistantMessage]);
     setMessageStreaming(true);
-    sendStreamedMessage(message);
+    sendStreamedMessage(message, files);
   };
 
   return (
@@ -200,7 +208,7 @@ export default function ChatPage() {
             <div ref={messagesEndRef}></div>
           </div>
 
-          <div className="mb-10">
+          <div className="mb-5">
             <InputField onSubmit={processSubmit} messageStreaming={messageStreaming} />
           </div>
         </div>

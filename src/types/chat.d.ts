@@ -20,6 +20,12 @@ export interface ChatHistory {
   chats: Chat[];
 }
 
+interface FileComponent {
+  name: string;
+  base64: string;
+  extension: string;
+}
+
 export enum Role {
   SYSTEM = 'system',
   USER = 'user',

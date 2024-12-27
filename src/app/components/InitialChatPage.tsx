@@ -4,6 +4,7 @@ import InputField from './InputField';
 import { useAuth } from '@/contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
+import { FileComponent } from '@/types/chat';
 
 export default function InitialChatPage() {
   const { user } = useAuth();
@@ -27,7 +28,7 @@ export default function InitialChatPage() {
     }
   };
 
-  const handleInitialSendMessage = async (message: string) => {
+  const handleInitialSendMessage = async (message: string, files: FileComponent[]) => {
     const chatId = uuidv4();
     await createChat(chatId, message);
     router.push(`/chat/${chatId}`);
@@ -46,7 +47,7 @@ export default function InitialChatPage() {
           </span>
         </div>
 
-        <div className="mb-10">
+        <div className="mb-5">
           <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
         </div>
       </div>

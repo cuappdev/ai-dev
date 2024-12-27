@@ -127,6 +127,20 @@ export default function ChatMessage({ lastMessage, streaming, message }: ChatMes
         >
           {message.content}
         </ReactMarkdown>
+        {/* TODO: Reuse same logic as in the InputField component to display images */}
+        <div className="flex gap-2">
+          {message.images &&
+            message.images.map((image, index) => (
+              <Image
+                key={index}
+                src={image}
+                width={200}
+                height={200}
+                alt="User uploaded image"
+                className="object-cover"
+              />
+            ))}
+        </div>
       </div>
     </div>
   );
