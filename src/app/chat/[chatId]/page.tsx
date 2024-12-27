@@ -10,8 +10,6 @@ import ChatMenuNavbar from '@/app/components/chat/ChatMenuNavbar';
 import ChatHeader from '@/app/components/chat/ChatHeader';
 import InputField from '@/app/components/InputField';
 import ChatMessage from '@/app/components/chat/ChatMessage';
-// import { toast } from 'react-toastify';
-// import Toast from '@/app/components/Toast';
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -31,27 +29,6 @@ export default function ChatPage() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
-
-  // useEffect(() => {
-  //   const fetchChat = async (chatId: string) => {
-  //     const response = await fetch(`/api/chat/${chatId}`);
-  //     if (!response.ok) {
-  //       notFound();
-  //       return;
-  //     }
-  //     const data = await response.json();
-  //     setMessages(data.messages);
-  //   };
-  //   fetchChat(chatId);
-  // }, [chatId]);
-
-  // TODO: Figure out which models become active and when
-  // const displayToast = async () => {
-  //   const activeModels = await fetchActiveModels();
-  //   if (!activeModels.includes('llama')) {
-  //     toast.info(`Loading ${selectedModel} into memory...`);
-  //   }
-  // };
 
   const createChatCompletionRequestBody = (message: string) => {
     const body: ChatCompletionRequest = {
@@ -177,7 +154,7 @@ export default function ChatPage() {
         timestamp: new Date().toLocaleString(),
         sender: selectedModel,
       };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      setMessages((prevMessages) => [...prevMessages.slice(0, -1), errorMessage]);
     }
   };
 
@@ -201,7 +178,6 @@ export default function ChatPage() {
     setMessages((prevMessages) => [...prevMessages, userMessage, assistantMessage]);
     setMessageStreaming(true);
     sendStreamedMessage(message);
-    // displayToast();
   };
 
   return (
@@ -229,7 +205,6 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
-      {/* <Toast /> */}
     </Protected>
   );
 }
