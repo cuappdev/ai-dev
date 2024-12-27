@@ -172,7 +172,7 @@ export default function ChatPage() {
       const errorMessage = {
         id: `${messages.length + 1}`,
         chatId: chatId,
-        content: `${error.message} - Please try again.`,
+        content: `${error.message}`,
         timestamp: new Date().toLocaleString(),
         sender: selectedModel,
       };

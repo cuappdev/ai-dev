@@ -62,7 +62,7 @@ export default function InputField({ onSubmit, messageStreaming }: InputFieldPro
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder={`Message ${selectedModel}`}
-        className="max-h-[150px] flex-1 resize-none overflow-hidden border-none text-gray-700 placeholder-gray-400 outline-none"
+        className="max-h-[150px] flex-1 resize-none border-none text-gray-700 placeholder-gray-400 outline-none"
         rows={1}
       />
 
