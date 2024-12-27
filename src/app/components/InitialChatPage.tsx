@@ -1,5 +1,3 @@
-'use client';
-
 import ChatMenuNavbar from './chat/ChatMenuNavbar';
 import ChatHeader from './chat/ChatHeader';
 import InputField from './InputField';
@@ -12,11 +10,26 @@ export default function InitialChatPage() {
   const firstName = user!.displayName!.split(' ')[0];
   const router = useRouter();
 
-  const handleInitialSendMessage = (message: string) => {
-    // TODO: Add the chat and message to the database
+  const createChat = async (uuid: string, message: string) => {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uuid,
+        message,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create chat');
+    }
+  };
+
+  const handleInitialSendMessage = async (message: string) => {
     const chatId = uuidv4();
-    // Delete, needed for linter
-    console.log(`Message: ${message}`);
+    await createChat(chatId, message);
     router.push(`/chat/${chatId}`);
   };
 
@@ -34,7 +47,7 @@ export default function InitialChatPage() {
         </div>
 
         <div className="mb-10">
-          <InputField messageStreaming={false} onSubmit={handleInitialSendMessage} />
+          <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
         </div>
       </div>
     </div>

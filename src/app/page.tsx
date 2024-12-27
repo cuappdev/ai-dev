@@ -1,4 +1,4 @@
-// TODO: Fix 'use client' directives - only put where needed
+// TODO: Fix 'use client' directives - only put where needed (needed at top of pages, not components)
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';

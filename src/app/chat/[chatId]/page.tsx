@@ -32,6 +32,19 @@ export default function ChatPage() {
     }
   }, [messages]);
 
+  // useEffect(() => {
+  //   const fetchChat = async (chatId: string) => {
+  //     const response = await fetch(`/api/chat/${chatId}`);
+  //     if (!response.ok) {
+  //       notFound();
+  //       return;
+  //     }
+  //     const data = await response.json();
+  //     setMessages(data.messages);
+  //   };
+  //   fetchChat(chatId);
+  // }, [chatId]);
+
   // TODO: Figure out which models become active and when
   // const displayToast = async () => {
   //   const activeModels = await fetchActiveModels();

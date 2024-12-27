@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChatHistory as History } from '@/types/chat';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -7,7 +7,7 @@ import Spinner from '../Spinner';
 import ModelModal from '../modals/ModelModal';
 import EmbedModal from '../modals/EmbedModal';
 import Modal from '../modals/Modal';
-import ChatMenu from './ChatMenu';
+import ChatMenu from './ChatHistoryEntry';
 
 export default function ChatMenuNavbar() {
   const { user, signOut } = useAuth();
@@ -17,6 +17,7 @@ export default function ChatMenuNavbar() {
   const router = useRouter();
   const [chatHistory, setChatHistory] = useState<History>({ chats: [] });
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // TODO: Fetch chat history from the server
   console.log(setChatHistory);
@@ -24,6 +25,23 @@ export default function ChatMenuNavbar() {
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
   };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      window.innerWidth < 768 &&
+      menuRef.current &&
+      !menuRef.current.contains(event.target as Node)
+    ) {
+      setIsNavbarOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  });
 
   useEffect(() => {
     const fetchChatHistory = async () => {
@@ -35,6 +53,7 @@ export default function ChatMenuNavbar() {
   return (
     <>
       <div
+        ref={menuRef}
         className={`flex-shrink-0 overscroll-none bg-black transition-all duration-300 ${isNavbarOpen ? 'w-64' : 'w-0'}`}
       >
         <div className="flex h-full flex-col justify-between">
@@ -123,7 +142,7 @@ export default function ChatMenuNavbar() {
                 <Spinner width="5" height="5" />
               </div>
             ) : (
-              <ChatMenu chats={chatHistory.chats} />
+              chatHistory.chats.map((chat) => <ChatMenu key={chat.id} chat={chat} />)
             ))}
 
           {isNavbarOpen && (

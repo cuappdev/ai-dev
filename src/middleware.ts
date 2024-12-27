@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
     handleValidToken: async ({ decodedToken }, headers) => {
       if (!decodedToken.email!.toLowerCase().endsWith('@cornell.edu')) {
         return NextResponse.json(
-          { message: 'Please sign in with your Cornell email' },
+          { message: 'Please sign in with your Cornell email.' },
           { status: 401, headers: headers },
         );
       }
@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
           },
         });
       }
-      return NextResponse.json({ message: `${message} - please login again` }, { status: 401 });
+      return NextResponse.json({ message: `Please login again - ${message}` }, { status: 401 });
     },
     handleError: async (error) => {
       return NextResponse.json({ message: (error as Error).message }, { status: 500 });
