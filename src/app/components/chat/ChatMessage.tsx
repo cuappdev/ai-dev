@@ -7,12 +7,15 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { materialDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
+import Spinner from '../Spinner';
 
 interface ChatMessageProps {
+  lastMessage: boolean;
+  streaming: boolean;
   message: Message;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
+export default function ChatMessage({ lastMessage, streaming, message }: ChatMessageProps) {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
 
@@ -60,7 +63,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
       />
       <div className="flex flex-col overflow-auto">
-        <span className="text-lg font-semibold">{getName()}</span>
+        <div className="flex gap-2 align-middle">
+          <span className="text-lg font-semibold">{getName()}</span>
+          {streaming && lastMessage && <Spinner width="1" height="1" />}
+        </div>
         <div className="flex flex-row gap-1">
           <span className="text-xs text-gray-400">{message.timestamp}</span>
           {copied ? (

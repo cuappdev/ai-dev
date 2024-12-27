@@ -98,6 +98,7 @@ export default function ChatPage() {
       throw new Error(data.error || 'Failed to send message.');
     }
 
+    setMessages((prevMessages) => [...prevMessages.slice(0, -1)]);
     return response.body.getReader();
   };
 
@@ -189,7 +190,15 @@ export default function ChatPage() {
       sender: 'user',
     };
 
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    const assistantMessage: Message = {
+      id: `${messages.length + 1}`,
+      chatId: chatId,
+      content: ``,
+      timestamp: new Date().toLocaleString(),
+      sender: selectedModel,
+    };
+
+    setMessages((prevMessages) => [...prevMessages, userMessage, assistantMessage]);
     setMessageStreaming(true);
     sendStreamedMessage(message);
     // displayToast();
@@ -205,7 +214,12 @@ export default function ChatPage() {
 
           <div className="no-scrollbar m-auto mb-10 mt-5 flex w-4/5 flex-grow flex-col gap-3 overflow-y-scroll">
             {messages.map((message, index) => (
-              <ChatMessage key={index} message={message} />
+              <ChatMessage
+                key={index}
+                lastMessage={index === messages.length - 1}
+                streaming={messageStreaming}
+                message={message}
+              />
             ))}
             <div ref={messagesEndRef}></div>
           </div>
