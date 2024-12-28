@@ -12,6 +12,7 @@ WORKDIR /app
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
 RUN npm ci --legacy-peer-deps
 
+RUN npm install -g typescript ts-node @types/node prisma
 
 # Rebuild the source code only when needed
 FROM base AS builder
