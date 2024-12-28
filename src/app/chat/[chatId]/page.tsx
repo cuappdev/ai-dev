@@ -30,6 +30,25 @@ export default function ChatPage() {
   // TODO: Fetch the chat from the server and load it into messages, then send a request to get the response if messages.length == 1
 
   useEffect(() => {
+    // TODO: Add loading indicators
+    const fetchChat = async () => {
+      try {
+        const response = await fetch(`/api/chats/${chatId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch chat');
+        }
+
+        const data = await response.json();
+        console.log(data);
+        setMessages(data.messages);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchChat();
+  }, [chatId]);
+
+  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }

@@ -8,6 +8,8 @@ import ModelModal from '../modals/ModelModal';
 import EmbedModal from '../modals/EmbedModal';
 import Modal from '../modals/Modal';
 import ChatHistoryEntry from './ChatHistoryEntry';
+import { toast } from 'react-toastify';
+import Toast from '../Toast';
 
 export default function ChatMenuNavbar() {
   const { user, signOut } = useAuth();
@@ -41,25 +43,20 @@ export default function ChatMenuNavbar() {
   }, []);
 
   useEffect(() => {
+    // TODO: Figure out why this is being called twice?
     const fetchChatHistory = async () => {
-      // const response = await fetch('/api/users/chats');
-      // const data = await response.json();
-      // setChatHistory(data);
-      setChatHistory({
-        chats: [
-          {
-            uid: '1',
-            userId: '1',
-            summary: 'Test',
-          },
-          {
-            uid: '2',
-            userId: '1',
-            summary: 'Test',
-          },
-        ],
-      });
-      setLoadingHistory(false);
+      try {
+        const response = await fetch('/api/chats');
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        const data = await response.json();
+        setChatHistory(data);
+      } catch (error) {
+        toast.error(JSON.parse((error as Error).message).message);
+      } finally {
+        setLoadingHistory(false);
+      }
     };
     setLoadingHistory(true);
     fetchChatHistory();
@@ -158,8 +155,8 @@ export default function ChatMenuNavbar() {
               </div>
             ) : (
               <div className="no-scrollbar mt-5 flex-1 flex-col justify-start overflow-y-auto">
-                {chatHistory.chats.map((chat) => (
-                  <ChatHistoryEntry key={chat.uid} chat={chat} />
+                {chatHistory.chats.map((chat, index) => (
+                  <ChatHistoryEntry key={index} chat={chat} />
                 ))}
               </div>
             ))}
@@ -266,6 +263,7 @@ export default function ChatMenuNavbar() {
           />
         </svg>
       </button>
+      <Toast />
     </>
   );
 }

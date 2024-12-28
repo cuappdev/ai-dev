@@ -11,15 +11,21 @@ export default function InitialChatPage() {
   const firstName = user!.displayName!.split(' ')[0];
   const router = useRouter();
 
-  const createChat = async (uuid: string, message: string) => {
-    const response = await fetch('/api/chat', {
+  const createChat = async (uuid: string, message: string, files: FileComponent[]) => {
+    const response = await fetch('/api/chats', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        uuid,
-        message,
+        chatId: uuid,
+        summary: message,
+        message: {
+          content: message,
+          images: files,
+          sender: 'user',
+          timestamp: new Date().toISOString(),
+        },
       }),
     });
 
@@ -30,7 +36,7 @@ export default function InitialChatPage() {
 
   const handleInitialSendMessage = async (message: string, files: FileComponent[]) => {
     const chatId = uuidv4();
-    await createChat(chatId, message);
+    await createChat(chatId, message, files);
     router.push(`/chat/${chatId}`);
   };
 

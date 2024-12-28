@@ -75,6 +75,7 @@ export const config = {
     '/api/models/pull',
     '/api/users/:path',
     '/api/embed',
+    '/api/chats',
     // Auth routes - used by library for cookie management
     '/api/login',
     '/api/logout',

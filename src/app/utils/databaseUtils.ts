@@ -1,7 +1,7 @@
 import prisma from '@/prisma';
-import { User } from '@prisma/client';
+import { Email, Message, User } from '@prisma/client';
 
-export async function createEmail(email: string) {
+export async function createEmail(email: string): Promise<Email> {
   return await prisma.email.create({
     data: {
       email: email,
@@ -25,10 +25,72 @@ export async function deleteEmail(email: string) {
   });
 }
 
-export async function getUser(uid: string): Promise<User | null> {
+export async function getUserById(uid: string): Promise<User | null> {
   return await prisma.user.findUnique({
     where: {
       uid: uid,
+    },
+  });
+}
+
+export async function getChatById(chatId: string) {
+  return await prisma.chat.findUnique({
+    where: {
+      uuid: chatId,
+    },
+  });
+}
+
+// Order by timestamp
+export async function getChatsByUserId(uid: string) {
+  // return await prisma.chat.findMany({
+  //   where: {
+  //     userId: uid,
+  //   },
+  //   orderBy: {
+  //     messages: {
+  //       timestamp: 'desc',
+  //     },
+  //   },
+  // });
+  return await prisma.chat.findMany({
+    where: {
+      userId: uid,
+    },
+  });
+}
+
+export async function createChatWithMessage(uid: string, chatId: string, message: Message) {
+  return await prisma.chat.create({
+    data: {
+      uuid: chatId,
+      // TODO: Fix summary
+      summary: message.content,
+      userId: uid,
+      messages: {
+        create: {
+          content: message.content,
+          images: message.images,
+          timestamp: message.timestamp,
+          sender: message.sender,
+        },
+      },
+    },
+  });
+}
+
+export async function deleteChatById(chatId: string) {
+  return await prisma.chat.delete({
+    where: {
+      uuid: chatId,
+    },
+  });
+}
+
+export async function getMessagesByChatId(chatId: string) {
+  return await prisma.message.findMany({
+    where: {
+      chatId: chatId,
     },
   });
 }
