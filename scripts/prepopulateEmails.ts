@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const appDevEmails = ['aa2328@cornell.edu'];
+const appDevEmails = ['a@cornell.edu', 'b@cornell.edu', 'c@cornell.edu'];
 
 async function main() {
   for (const email of appDevEmails) {
@@ -12,7 +12,6 @@ async function main() {
       update: {},
     });
   }
-  console.log(await prisma.email.findMany());
 }
 
 main()
