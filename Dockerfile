@@ -46,7 +46,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-COPY scripts ./scripts
+# Copying scripts and node_modules required for seeding
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/scripts ./scripts
 
 USER nextjs
 
