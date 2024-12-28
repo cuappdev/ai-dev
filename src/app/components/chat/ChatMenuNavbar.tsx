@@ -1,26 +1,23 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, useRef } from 'react';
-import { ChatHistory as History } from '@/types/chat';
+import { Chats } from '@/types/chat';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Spinner from '../Spinner';
 import ModelModal from '../modals/ModelModal';
 import EmbedModal from '../modals/EmbedModal';
 import Modal from '../modals/Modal';
-import ChatMenu from './ChatHistoryEntry';
+import ChatHistoryEntry from './ChatHistoryEntry';
 
 export default function ChatMenuNavbar() {
   const { user, signOut } = useAuth();
   const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [isModelModalOpen, setIsModelModalOpen] = useState(false);
-  const [chatHistory, setChatHistory] = useState<History>({ chats: [] });
+  const [chatHistory, setChatHistory] = useState<Chats>({ chats: [] });
   const [loadingHistory, setLoadingHistory] = useState(true);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // TODO: Fetch chat history from the server
-  console.log(setChatHistory);
 
   const toggleNavbar = () => {
     setIsNavbarOpen(!isNavbarOpen);
@@ -45,8 +42,26 @@ export default function ChatMenuNavbar() {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
+      // const response = await fetch('/api/users/chats');
+      // const data = await response.json();
+      // setChatHistory(data);
+      setChatHistory({
+        chats: [
+          {
+            uid: '1',
+            userId: '1',
+            summary: 'Test',
+          },
+          {
+            uid: '2',
+            userId: '1',
+            summary: 'Test',
+          },
+        ],
+      });
       setLoadingHistory(false);
     };
+    setLoadingHistory(true);
     fetchChatHistory();
   }, []);
 
@@ -142,7 +157,11 @@ export default function ChatMenuNavbar() {
                 <Spinner width="5" height="5" />
               </div>
             ) : (
-              chatHistory.chats.map((chat) => <ChatMenu key={chat.id} chat={chat} />)
+              <div className="no-scrollbar mt-5 flex-1 flex-col justify-start overflow-y-auto">
+                {chatHistory.chats.map((chat) => (
+                  <ChatHistoryEntry key={chat.uid} chat={chat} />
+                ))}
+              </div>
             ))}
 
           {isNavbarOpen && (

@@ -10,13 +10,13 @@ export interface Message {
 }
 
 export interface Chat {
-  id: string;
+  uid: string;
   userId: string;
   summary: string;
-  messages: Message[];
+  messages?: Message[];
 }
 
-export interface ChatHistory {
+export interface Chats {
   chats: Chat[];
 }
 

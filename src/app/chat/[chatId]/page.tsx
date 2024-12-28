@@ -36,7 +36,6 @@ export default function ChatPage() {
   }, [messages]);
 
   const createChatCompletionRequestBody = (message: string, files: FileComponent[]) => {
-    console.log(files);
     const body: ChatCompletionRequest = {
       model: selectedModel,
       stream: true,
@@ -101,7 +100,6 @@ export default function ChatPage() {
       for (const line of lines) {
         if (line.trim()) {
           try {
-            console.log(line);
             const response: ChatStreamCompletionResponse = JSON.parse(line);
             updateMessages(response);
             if (response.done) {
