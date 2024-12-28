@@ -25,7 +25,6 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npx prisma generate
-RUN npx prisma db seed
 RUN npm run build
 
 # Production image, copy all the files and run next

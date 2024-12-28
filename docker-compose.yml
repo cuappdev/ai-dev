@@ -4,6 +4,14 @@ services:
     networks:
       - app-network
 
+  seeder:
+    image: cornellappdev/ai-dev:${IMAGE_TAG}
+    command: ["npx", "prisma", "db", "seed"]
+    env_file:
+      - .env
+    volumes:
+      - ./ca-certificate.crt:/app/ca-certificate.crt:ro
+
   ai-dev-app:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
     ports:
@@ -14,6 +22,7 @@ services:
       - ./ca-certificate.crt:/app/ca-certificate.crt:ro
     depends_on:
       - ollama
+      - seeder
     networks:
       - app-network
 
