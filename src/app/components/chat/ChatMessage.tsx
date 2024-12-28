@@ -99,7 +99,6 @@ export default function ChatMessage({ lastMessage, streaming, message }: ChatMes
           )}
         </div>
         <ReactMarkdown
-          className={'whitespace-pre-line'}
           remarkPlugins={[remarkGfm]}
           components={{
             code({
@@ -115,11 +114,11 @@ export default function ChatMessage({ lastMessage, streaming, message }: ChatMes
               const match = /language-(\w+)/.exec(className || '');
               return !inline && match ? (
                 <SyntaxHighlighter style={materialDark} language={match[1]} PreTag="div" {...props}>
-                  {String(children).replace(/\n$/, '')}
+                  {String(children)}
                 </SyntaxHighlighter>
               ) : (
                 <code className={className} {...props}>
-                  {children}
+                  {String(children)}
                 </code>
               );
             },

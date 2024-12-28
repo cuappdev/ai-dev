@@ -101,6 +101,7 @@ export default function ChatPage() {
       for (const line of lines) {
         if (line.trim()) {
           try {
+            console.log(line);
             const response: ChatStreamCompletionResponse = JSON.parse(line);
             updateMessages(response);
             if (response.done) {
@@ -190,7 +191,7 @@ export default function ChatPage() {
 
   return (
     <Protected>
-      <div className="flex h-svh w-full flex-row gap-0">
+      <div className="flex h-svh flex-row gap-0">
         <ChatMenuNavbar />
 
         <div className="flex w-full flex-col">
