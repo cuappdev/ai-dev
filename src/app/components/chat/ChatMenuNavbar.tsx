@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, useRef } from 'react';
-import { Chats } from '@/types/chat';
+import { Chat } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Spinner from '../Spinner';
@@ -16,7 +16,7 @@ export default function ChatMenuNavbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(!(window.innerWidth < 768));
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [isModelModalOpen, setIsModelModalOpen] = useState(false);
-  const [chatHistory, setChatHistory] = useState<Chats>({ chats: [] });
+  const [chatHistory, setChatHistory] = useState<Chat[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -155,7 +155,7 @@ export default function ChatMenuNavbar() {
               </div>
             ) : (
               <div className="no-scrollbar mt-5 flex-1 flex-col justify-start overflow-y-auto">
-                {chatHistory.chats.map((chat, index) => (
+                {chatHistory.map((chat, index) => (
                   <ChatHistoryEntry key={index} chat={chat} />
                 ))}
               </div>

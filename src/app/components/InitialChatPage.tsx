@@ -41,22 +41,25 @@ export default function InitialChatPage() {
   };
 
   return (
-    <div className="flex h-svh flex-row gap-0">
-      <ChatMenuNavbar />
+    <>
+      <div className="flex h-svh flex-row gap-0">
+        <ChatMenuNavbar />
 
-      <div className="flex w-full flex-col">
-        <ChatHeader />
-        <div className="m-auto mt-10 flex w-4/5 flex-grow flex-col gap-3">
-          <span className="text-7xl font-semibold">{`Hello, ${firstName}`}</span>
-          <span className="text-3xl font-semibold text-primaryColor">
-            How can I help you today?
-          </span>
-        </div>
+        <div className="flex w-full flex-col">
+          <ChatHeader />
+          <div className="m-auto mt-10 flex w-4/5 flex-grow flex-col gap-3">
+            <span className="text-7xl font-semibold">{`Hello, ${firstName}`}</span>
+            <span className="text-3xl font-semibold text-primaryColor">
+              How can I help you today?
+            </span>
+          </div>
 
-        <div className="mb-5">
-          <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
+          <div className="mb-5">
+            <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
+          </div>
         </div>
       </div>
-    </div>
+      <Toast />
+    </>
   );
 }
