@@ -9,21 +9,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   });
 }
 
-export async function upsertAppDevUser(email: string): Promise<User | null> {
-  return await prisma.user.upsert({
-    where: {
-      email: email,
-    },
-    update: {
-      isAppDev: true,
-    },
-    create: {
-      email: email,
-      isAppDev: true,
-    },
-  });
-}
-
 export async function upsertUser(email: string): Promise<User | null> {
   return await prisma.user.upsert({
     where: {
