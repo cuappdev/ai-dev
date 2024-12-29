@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { upsertAppDevUser } from '@/app/utils/databaseUtils';
+import { upsertAppDevUser } from '../src/app/utils/databaseUtils';
 
 const prisma = new PrismaClient();
 

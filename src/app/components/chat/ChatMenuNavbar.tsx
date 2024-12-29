@@ -51,7 +51,7 @@ export default function ChatMenuNavbar() {
           throw new Error(await response.text());
         }
         const data = await response.json();
-        setChatHistory(data);
+        setChatHistory(data.chats);
       } catch (error) {
         toast.error(JSON.parse((error as Error).message).message);
       } finally {

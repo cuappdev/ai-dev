@@ -6,7 +6,7 @@ services:
 
   seeder:
     image: cornellappdev/ai-dev:${IMAGE_TAG}
-    command: ["npx", "prisma", "db", "seed"]
+    command: ['npx', 'prisma', 'db', 'seed']
     env_file:
       - .env
     volumes:
