@@ -54,9 +54,7 @@ export default function InitialChatPage() {
             </span>
           </div>
 
-          <div className="mb-5">
-            <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
-          </div>
+          <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
         </div>
       </div>
       <Toast />

@@ -14,7 +14,9 @@ export default function ChatHistoryEntry({ chat }: ChatHistoryEntryProps) {
       onClick={() => router.push(`/chat/${chat.id}`)}
       className={`m-auto flex w-11/12 cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-[#212121] ${chatId === chat.id ? 'bg-[#212121]' : ''}`}
     >
-      <span className="text-sm text-white">{chat.summary}</span>
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-white">
+        {chat.summary}
+      </span>
       <div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
