@@ -4,7 +4,7 @@ export interface Message {
   id: string;
   chatId: string;
   content: string;
-  images?: string[];
+  images: string[];
   timestamp: string;
   sender: string;
 }

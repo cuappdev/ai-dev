@@ -1,41 +1,33 @@
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
+  url      = env("MONGO_DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Email {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  email String @unique
-  user  User?
-}
-
 model User {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  uid     String  @unique
-  isLead  Boolean
-  email   Email   @relation(fields: [emailId], references: [id])
-  emailId String  @unique @db.ObjectId
-  chats   Chat[]
+  email    String  @id @map("_id")
+  isAppDev Boolean
+  chats    Chat[]
 }
 
 model Chat {
-  uuid     String    @id @map("_id")
-  summary  String
-  user     User      @relation(fields: [userId], references: [uid])
-  userId   String
-  messages Message[]
+  id        String    @id @map("_id")
+  summary   String
+  updatedAt DateTime
+  user      User      @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  userEmail String
+  messages  Message[]
 }
 
 model Message {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   content   String
   images    String[]
-  timestamp DateTime @default(now())
+  timestamp DateTime
   sender    String
-  chat      Chat     @relation(fields: [chatId], references: [uuid])
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId    String
 }

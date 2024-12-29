@@ -40,7 +40,6 @@ export async function middleware(request: NextRequest) {
 
       // Pass along headers to be used by the routes
       const forwardedHeaders = new Headers(headers);
-      forwardedHeaders.set('uid', decodedToken.uid!);
       forwardedHeaders.set('email', decodedToken.email!);
       return NextResponse.next({
         request: {
@@ -73,7 +72,8 @@ export const config = {
     '/api/models/copy',
     '/api/models/create',
     '/api/models/pull',
-    '/api/users/:path',
+    '/api/chats',
+    '/api/chats/:path',
     '/api/embed',
     '/api/chats',
     // Auth routes - used by library for cookie management

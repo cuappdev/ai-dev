@@ -18,20 +18,22 @@ import ChatMessage from '@/app/components/chat/ChatMessage';
 
 export default function ChatPage() {
   const { user } = useAuth();
-  const { selectedModel, fetchActiveModels } = useModel();
+  const { selectedModel } = useModel();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageStreaming, setMessageStreaming] = useState(false);
   const pathname = usePathname();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatId = pathname.split('/')[2];
+  const hasFetched = useRef(false);
 
   // TODO: Change title of page to summary of the chat on each page
   // TODO: Fix navbar toggle and rerendering
-  // TODO: Fetch the chat from the server and load it into messages, then send a request to get the response if messages.length == 1
 
   useEffect(() => {
     // TODO: Add loading indicators
     const fetchChat = async () => {
+      if (hasFetched.current) return; // Prevent second execution
+      hasFetched.current = true;
       try {
         const response = await fetch(`/api/chats/${chatId}`);
         if (!response.ok) {
@@ -39,20 +41,43 @@ export default function ChatPage() {
         }
 
         const data = await response.json();
-        console.log(data);
         setMessages(data.messages);
+
+        if (data.messages && data.messages.length === 1) {
+          initiateResponse(data.messages[data.messages.length - 1].content, []);
+        }
       } catch (error) {
         console.error(error);
       }
     };
     fetchChat();
-  }, [chatId]);
+  }, []);
 
+  // TODO: Add button to scroll to bottom of chat
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
+
+  // const saveMessage = async (message: string, files: string[], sender: string) => {
+  //   const response = await fetch(`/api/chats/${chatId}`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       content: message,
+  //       images: files,
+  //       timestamp: new Date().toISOString(),
+  //       sender: sender,
+  //     }),
+  //   });
+
+  //   if (!response.ok) {
+  //     throw new Error('Failed to create chat');
+  //   }
+  // };
 
   const createChatCompletionRequestBody = (message: string, files: FileComponent[]) => {
     const body: ChatCompletionRequest = {
@@ -66,7 +91,8 @@ export default function ChatPage() {
         {
           role: 'user',
           content: message,
-          images: files.map((file) => file.base64.split(',')[1]),
+          // images: files.map((file) => file.base64.split(',')[1]),
+          images: [],
         },
       ],
     };
@@ -161,7 +187,7 @@ export default function ChatPage() {
             id: `${messages.length + 1}`,
             chatId: chatId,
             content: response.message!.content,
-            images: response.message!.images,
+            images: response.message!.images!,
             timestamp: new Date().toLocaleString(),
             sender: selectedModel,
           },
@@ -176,6 +202,7 @@ export default function ChatPage() {
         id: `${messages.length + 1}`,
         chatId: chatId,
         content: `${error.message}`,
+        images: [],
         timestamp: new Date().toLocaleString(),
         sender: selectedModel,
       };
@@ -183,27 +210,35 @@ export default function ChatPage() {
     }
   };
 
+  const initiateResponse = async (message: string, files: FileComponent[]) => {
+    const assistantMessage: Message = {
+      id: `${messages.length + 1}`,
+      chatId: chatId,
+      content: ``,
+      images: [],
+      timestamp: new Date().toLocaleString(),
+      sender: selectedModel,
+    };
+
+    setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    setMessageStreaming(true);
+    sendStreamedMessage(message, files);
+  };
+
   const processSubmit = async (message: string, files: FileComponent[]) => {
     const userMessage: Message = {
       id: `${messages.length}`,
       chatId: chatId,
       content: message,
-      images: files.map((file) => file.base64),
+      // images: files.map((file) => file.base64),
+      images: [],
       timestamp: new Date().toLocaleString(),
       sender: 'user',
     };
 
-    const assistantMessage: Message = {
-      id: `${messages.length + 1}`,
-      chatId: chatId,
-      content: ``,
-      timestamp: new Date().toLocaleString(),
-      sender: selectedModel,
-    };
-
-    setMessages((prevMessages) => [...prevMessages, userMessage, assistantMessage]);
-    setMessageStreaming(true);
-    sendStreamedMessage(message, files);
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    // saveMessage(message, files.map((file) => file.base64.split(',')[1]), 'user');
+    initiateResponse(message, files);
   };
 
   return (

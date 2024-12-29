@@ -5,39 +5,39 @@ import { useAuth } from '@/contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
 import { FileComponent } from '@/types/chat';
+import Toast from './Toast';
+import { toast } from 'react-toastify';
 
 export default function InitialChatPage() {
   const { user } = useAuth();
   const firstName = user!.displayName!.split(' ')[0];
   const router = useRouter();
 
-  const createChat = async (uuid: string, message: string, files: FileComponent[]) => {
-    const response = await fetch('/api/chats', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chatId: uuid,
-        summary: message,
-        message: {
+  const createChat = async (chatId: string, message: string, files: FileComponent[]) => {
+    try {
+      const response = await fetch(`/api/chats/${chatId}`, {
+        method: 'POST',
+        body: JSON.stringify({
           content: message,
           images: files,
+          timestamp: new Date(),
           sender: 'user',
-          timestamp: new Date().toISOString(),
-        },
-      }),
-    });
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to create chat');
+      if (!response.ok) {
+        throw new Error('Failed to create chat');
+      }
+
+      router.push(`/chat/${chatId}`);
+    } catch (error) {
+      toast.error((error as Error).message);
     }
   };
 
   const handleInitialSendMessage = async (message: string, files: FileComponent[]) => {
     const chatId = uuidv4();
     await createChat(chatId, message, files);
-    router.push(`/chat/${chatId}`);
   };
 
   return (

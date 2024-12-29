@@ -1,17 +1,18 @@
-import { Chat } from '@/types/chat';
-// import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { Chat } from '@prisma/client';
 
 interface ChatHistoryEntryProps {
   chat: Chat;
 }
 
 export default function ChatHistoryEntry({ chat }: ChatHistoryEntryProps) {
-  const chatId = '1';
-  // const chatId = usePathname().split('/').pop();
+  const chatId = usePathname().split('/').pop();
+  const router = useRouter();
 
   return (
     <div
-      className={`m-auto flex w-11/12 cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-[#212121] ${chatId === chat.uid ? 'bg-[#212121]' : ''}`}
+      onClick={() => router.push(`/chat/${chat.id}`)}
+      className={`m-auto flex w-11/12 cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-[#212121] ${chatId === chat.id ? 'bg-[#212121]' : ''}`}
     >
       <span className="text-sm text-white">{chat.summary}</span>
       <div>
@@ -30,6 +31,7 @@ export default function ChatHistoryEntry({ chat }: ChatHistoryEntryProps) {
           />
         </svg>
 
+        {/* Add delete drop down */}
         {/* <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
