@@ -43,7 +43,7 @@ export default function ChatPage() {
         const data = await response.json();
         setMessages(data.messages);
 
-        if (data.messages && data.messages.length === 1) {
+        if (data.messages && data.messages.length == 1) {
           initiateResponse(data.messages[data.messages.length - 1].content, []);
         }
       } catch (error) {
@@ -51,7 +51,7 @@ export default function ChatPage() {
       }
     };
     fetchChat();
-  }, []);
+  });
 
   // TODO: Add button to scroll to bottom of chat
   useEffect(() => {
@@ -60,24 +60,24 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  // const saveMessage = async (message: string, files: string[], sender: string) => {
-  //   const response = await fetch(`/api/chats/${chatId}`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       content: message,
-  //       images: files,
-  //       timestamp: new Date().toISOString(),
-  //       sender: sender,
-  //     }),
-  //   });
+  const saveMessage = async (message: string, images: string[], sender: string) => {
+    const response = await fetch(`/api/chats/${chatId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: message,
+        images: images,
+        timestamp: new Date().toISOString(),
+        sender: sender,
+      }),
+    });
 
-  //   if (!response.ok) {
-  //     throw new Error('Failed to create chat');
-  //   }
-  // };
+    if (!response.ok) {
+      throw new Error('Failed to create chat');
+    }
+  };
 
   const createChatCompletionRequestBody = (message: string, files: FileComponent[]) => {
     const body: ChatCompletionRequest = {
@@ -91,8 +91,8 @@ export default function ChatPage() {
         {
           role: 'user',
           content: message,
-          // images: files.map((file) => file.base64.split(',')[1]),
-          images: [],
+          images: files.map((file) => file.base64.split(',')[1]),
+          // images: [],
         },
       ],
     };
@@ -131,6 +131,7 @@ export default function ChatPage() {
 
   const processStreamedResponse = async (reader: ReadableStreamDefaultReader) => {
     const decoder = new TextDecoder('utf-8');
+    let completeMessage = '';
     let buffer = '';
     let done = false;
 
@@ -146,6 +147,7 @@ export default function ChatPage() {
         if (line.trim()) {
           try {
             const response: ChatStreamCompletionResponse = JSON.parse(line);
+            completeMessage += response.message!.content;
             updateMessages(response);
             if (response.done) {
               done = true;
@@ -162,11 +164,14 @@ export default function ChatPage() {
     if (buffer.trim()) {
       try {
         const response: ChatStreamCompletionResponse = JSON.parse(buffer);
+        completeMessage += response.message!.content;
         updateMessages(response);
       } catch (error) {
         displayError(error);
       }
     }
+
+    saveMessage(completeMessage, [], selectedModel);
   };
 
   const updateMessages = (response: ChatStreamCompletionResponse) => {
@@ -230,14 +235,18 @@ export default function ChatPage() {
       id: `${messages.length}`,
       chatId: chatId,
       content: message,
-      // images: files.map((file) => file.base64),
-      images: [],
+      images: files.map((file) => file.base64),
+      // images: [],
       timestamp: new Date().toLocaleString(),
       sender: 'user',
     };
 
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-    // saveMessage(message, files.map((file) => file.base64.split(',')[1]), 'user');
+    saveMessage(
+      message,
+      files.map((file) => file.base64.split(',')[1]),
+      'user',
+    );
     initiateResponse(message, files);
   };
 
