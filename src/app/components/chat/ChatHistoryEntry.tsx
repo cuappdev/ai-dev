@@ -12,7 +12,7 @@ export default function ChatHistoryEntry({ chat }: ChatHistoryEntryProps) {
   return (
     <div
       onClick={() => router.push(`/chat/${chat.id}`)}
-      className={`m-auto flex w-11/12 cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-[#212121] ${chatId === chat.id ? 'bg-[#212121]' : ''}`}
+      className={`m-auto flex w-full cursor-pointer items-center justify-between rounded-lg p-2 hover:bg-[#212121] ${chatId === chat.id ? 'bg-[#212121]' : ''}`}
     >
       <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-white">
         {chat.summary}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import ChatMenuNavbar from '@/app/components/chat/ChatMenuNavbar';
+import ChatMenu from '@/app/components/chat/ChatMenu';
 import ChatHeader from '@/app/components/chat/ChatHeader';
 import Spinner from './components/Spinner';
 import Protected from './components/Protected';
@@ -31,7 +31,7 @@ export default function NotFoundPage() {
   return (
     <Protected>
       <div className="flex h-svh flex-row gap-0">
-        <ChatMenuNavbar />
+        <ChatMenu />
         <div className="flex w-full flex-col">
           <ChatHeader />
           <div className="m-auto mt-10 flex w-4/5 flex-grow flex-col gap-3">

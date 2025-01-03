@@ -1,4 +1,4 @@
-interface EmbedModalProps {
+export interface EmbedModalProps {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }

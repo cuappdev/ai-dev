@@ -1,4 +1,4 @@
-import ChatMenuNavbar from './chat/ChatMenuNavbar';
+import ChatMenu from './chat/ChatMenu';
 import ChatHeader from './chat/ChatHeader';
 import InputField from './InputField';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,7 +43,7 @@ export default function InitialChatPage() {
   return (
     <>
       <div className="flex h-svh flex-row gap-0">
-        <ChatMenuNavbar />
+        <ChatMenu />
 
         <div className="flex w-full flex-col">
           <ChatHeader />

@@ -10,7 +10,7 @@ import Spinner from '../Spinner';
 import { toast } from 'react-toastify';
 import Toast from '../Toast';
 
-interface ModelModalProps {
+export interface ModelModalProps {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }

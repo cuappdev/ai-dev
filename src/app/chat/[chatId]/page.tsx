@@ -11,7 +11,7 @@ import {
   Message,
 } from '@/types/chat';
 import Protected from '@/app/components/Protected';
-import ChatMenuNavbar from '@/app/components/chat/ChatMenuNavbar';
+import ChatMenu from '@/app/components/chat/ChatMenu';
 import ChatHeader from '@/app/components/chat/ChatHeader';
 import InputField from '@/app/components/InputField';
 import ChatMessage from '@/app/components/chat/ChatMessage';
@@ -253,7 +253,7 @@ export default function ChatPage() {
   return (
     <Protected>
       <div className="flex h-svh flex-row gap-0">
-        <ChatMenuNavbar />
+        <ChatMenu />
 
         <div className="flex w-full flex-col">
           <ChatHeader />

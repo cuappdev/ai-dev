@@ -4,7 +4,6 @@ import { authMiddleware } from 'next-firebase-auth-edge';
 const { privateKey } = JSON.parse(process.env.FIREBASE_ADMIN_PRIVATE_KEY!);
 
 export async function middleware(request: NextRequest) {
-  // TODO: Cache the middleware
   // TODO: Move check for user in database once Node.js runtime support is added to next middleware (https://github.com/vercel/next.js/discussions/71727)
   return authMiddleware(request, {
     // Sets cookie
