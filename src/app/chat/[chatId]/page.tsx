@@ -286,7 +286,11 @@ export default function ChatPage() {
             <div ref={messagesEndRef}></div>
           </div>
 
-          <InputField onSubmit={processSubmit} onAbort={processAbort} messageStreaming={messageStreaming} />
+          <InputField
+            onSubmit={processSubmit}
+            onAbort={processAbort}
+            messageStreaming={messageStreaming}
+          />
         </div>
       </div>
     </Protected>
