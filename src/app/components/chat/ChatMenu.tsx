@@ -119,7 +119,7 @@ export default function ChatMenu() {
 
           <ChatHistory />
 
-          {isMenuOpen &&
+          {isMenuOpen && (
             <div className="flex flex-col gap-5 p-5 text-stone-300">
               <div className="flex items-center gap-2">
                 <Image
@@ -182,7 +182,7 @@ export default function ChatMenu() {
                 </button>
               </div>
             </div>
-          }
+          )}
         </div>
       </div>
 
