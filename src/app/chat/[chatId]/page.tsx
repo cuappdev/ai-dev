@@ -25,6 +25,7 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatId = pathname.split('/')[2];
   const hasFetched = useRef(false);
+  const controllerRef = useRef<AbortController | null>(null);
 
   // TODO: Change title of page to summary of the chat on each page
   // TODO: Fix navbar toggle and rerendering
@@ -103,7 +104,9 @@ export default function ChatPage() {
     const body = createChatCompletionRequestBody(message, files);
     try {
       const reader = await fetchChatResponse(body);
-      await processStreamedResponse(reader);
+      if (reader) {
+        await processStreamedResponse(reader);
+      }
     } catch (error: unknown) {
       displayError(error);
     } finally {
@@ -112,8 +115,12 @@ export default function ChatPage() {
   };
 
   const fetchChatResponse = async (body: ChatCompletionRequest) => {
+    controllerRef.current = new AbortController();
+    const { signal } = controllerRef.current;
+
     const response = await fetch(`/api/models`, {
       method: 'POST',
+      signal: signal,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -122,6 +129,9 @@ export default function ChatPage() {
 
     if (!response.ok || !response.body) {
       const data = await response.json();
+      if (data.error.name !== 'AbortError') {
+        return;
+      }
       throw new Error(data.error || 'Failed to send message.');
     }
 
@@ -236,7 +246,6 @@ export default function ChatPage() {
       chatId: chatId,
       content: message,
       images: files.map((file) => file.base64),
-      // images: [],
       timestamp: new Date().toLocaleString(),
       sender: 'user',
     };
@@ -248,6 +257,13 @@ export default function ChatPage() {
       'user',
     );
     initiateResponse(message, files);
+  };
+
+  const processAbort = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort();
+      controllerRef.current = null;
+    }
   };
 
   return (
@@ -270,7 +286,7 @@ export default function ChatPage() {
             <div ref={messagesEndRef}></div>
           </div>
 
-          <InputField onSubmit={processSubmit} messageStreaming={messageStreaming} />
+          <InputField onSubmit={processSubmit} onAbort={processAbort} messageStreaming={messageStreaming} />
         </div>
       </div>
     </Protected>

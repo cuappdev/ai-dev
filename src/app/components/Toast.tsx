@@ -1,9 +1,10 @@
 import { ToastContainer, Slide } from 'react-toastify';
 
-export default function ErrorToast() {
+export default function Toast() {
   return (
     <ToastContainer
       className={'p-2 text-sm'}
+      stacked={true}
       closeButton={false}
       position="bottom-center"
       autoClose={5000}
@@ -11,7 +12,7 @@ export default function ErrorToast() {
       newestOnTop={false}
       closeOnClick={true}
       rtl={false}
-      pauseOnHover
+      pauseOnHover={false}
       theme="colored"
       transition={Slide}
     />

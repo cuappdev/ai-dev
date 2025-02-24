@@ -7,10 +7,11 @@ import Image from 'next/image';
 
 interface InputFieldProps {
   onSubmit: (message: string, files: FileComponent[]) => void;
+  onAbort: () => void;
   messageStreaming: boolean;
 }
 
-export default function InputField({ onSubmit, messageStreaming }: InputFieldProps) {
+export default function InputField({ onSubmit, onAbort, messageStreaming }: InputFieldProps) {
   const { selectedModel } = useModel();
   const [files, setFiles] = useState<FileComponent[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -155,7 +156,7 @@ export default function InputField({ onSubmit, messageStreaming }: InputFieldPro
           {messageStreaming ? (
             // TODO: Handle aborting message streaming
 
-            <button className="ml-3">
+            <button className="ml-3" onClick={() => onAbort()}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

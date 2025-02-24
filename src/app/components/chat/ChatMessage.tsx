@@ -68,7 +68,9 @@ export default function ChatMessage({ lastMessage, streaming, message }: ChatMes
           {streaming && lastMessage && <Spinner width="1" height="1" />}
         </div>
         <div className="flex flex-row gap-1">
-          <span className="text-xs text-gray-400">{message.timestamp}</span>
+          <span className="text-xs text-gray-400">
+            {new Date(message.timestamp).toLocaleString()}
+          </span>
           {copied ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -99,6 +101,7 @@ export default function ChatMessage({ lastMessage, streaming, message }: ChatMes
           )}
         </div>
         <ReactMarkdown
+          // className={'w-4/5 max-w-4/5 overflow-auto bg-red-200 break-before-auto'}
           remarkPlugins={[remarkGfm]}
           components={{
             code({
