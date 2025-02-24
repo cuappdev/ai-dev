@@ -8,17 +8,19 @@ generator client {
 }
 
 model User {
-  email    String  @id @map("_id")
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  uid      String? @unique
+  email    String  @unique
   isAppDev Boolean
   chats    Chat[]
 }
 
 model Chat {
-  id        String    @id @map("_id")
+  id        String    @id @default(uuid()) @map("_id")
   summary   String
-  updatedAt DateTime
-  user      User      @relation(fields: [userEmail], references: [email], onDelete: Cascade)
-  userEmail String
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [uid], onDelete: Cascade)
+  userId    String
   messages  Message[]
 }
 
@@ -26,7 +28,7 @@ model Message {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   content   String
   images    String[]
-  timestamp DateTime
+  timestamp DateTime @default(now())
   sender    String
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId    String

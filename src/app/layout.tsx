@@ -28,6 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <PublicEnvScript />
       </head>
       <body>
+        {/* TODO: Global error boundary */}
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -25,6 +25,7 @@ export const ModelProvider = ({ children }: { children: ReactNode }) => {
   const defaultModel = env('NEXT_PUBLIC_DEFAULT_MODEL');
   const [selectedModel, setSelectedModel] = useState<string>(defaultModel!);
 
+  // TODO: Maybe delete?
   const fetchAllModels = async () => {
     return await fetch('/api/models/all')
       .then((response) => response.json())
@@ -33,6 +34,7 @@ export const ModelProvider = ({ children }: { children: ReactNode }) => {
       });
   };
 
+  // TODO: Maybe delete?
   const fetchActiveModels = async () => {
     return await fetch('/api/models/active')
       .then((response) => response.json())

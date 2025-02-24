@@ -1,33 +1,45 @@
 import prisma from '@/prisma';
 import { User, Chat, Message } from '@prisma/client';
 
-export async function getUserByEmail(email: string): Promise<User | null> {
+export async function getUserByUid(uid: string): Promise<User | null> {
   return await prisma.user.findUnique({
     where: {
-      email: email,
+      uid: uid,
     },
   });
 }
 
-export async function upsertUser(email: string): Promise<User | null> {
+export async function updateUserEmailByUid(uid: string, newEmail: string): Promise<User | null> {
+  return await prisma.user.update({
+    where: {
+      uid: uid,
+    },
+    data: {
+      email: newEmail,
+    },
+  });
+}
+
+export async function upsertUser(email: string, uid: string): Promise<User | null> {
   return await prisma.user.upsert({
     where: {
       email: email,
     },
     update: {
-      isAppDev: false,
+      uid: uid,
     },
     create: {
+      uid: uid,
       email: email,
       isAppDev: false,
     },
   });
 }
 
-export async function getChatsByEmail(email: string): Promise<Chat[]> {
+export async function getChatsByUid(uid: string): Promise<Chat[]> {
   return await prisma.chat.findMany({
     where: {
-      userEmail: email,
+      userId: uid,
     },
     orderBy: {
       updatedAt: 'desc',
@@ -43,20 +55,29 @@ export async function getChatById(chatId: string): Promise<Chat | null> {
   });
 }
 
+export async function getChatWithMessagesById(chatId: string): Promise<Chat | null> {
+  return await prisma.chat.findUnique({
+    where: {
+      id: chatId,
+    },
+    include: {
+      messages: true,
+    },
+  });
+}
+
 export async function createChat(
-  email: string,
+  uid: string,
   chatId: string,
   summary: string,
-  updatedAt: Date,
 ): Promise<Chat | null> {
   return await prisma.chat.create({
     data: {
       id: chatId,
       summary: summary,
-      updatedAt: updatedAt,
       user: {
         connect: {
-          email: email,
+          uid: uid,
         },
       },
     },
@@ -74,19 +95,11 @@ export async function updateChatTimestamp(chatId: string, timestamp: Date): Prom
   });
 }
 
-// Cascade to delete all the messages
+// TODO: Test if cascade deletes all the messages
 export async function deleteChatById(chatId: string): Promise<Chat | null> {
   return await prisma.chat.delete({
     where: {
       id: chatId,
-    },
-  });
-}
-
-export async function getMessagesByChatId(chatId: string): Promise<Message[]> {
-  return await prisma.message.findMany({
-    where: {
-      chatId: chatId,
     },
   });
 }

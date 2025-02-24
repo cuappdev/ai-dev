@@ -1,3 +1,4 @@
+// import { getUserByUid } from './databaseUtils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function createClonedRequest(request: NextRequest) {
@@ -25,13 +26,14 @@ export async function cloneRequest(request: NextRequest, url: string) {
   const init: RequestInit = await createClonedRequest(request);
 
   try {
+    console.log(
+      `\nSending Request at ${new Date()}.\nURL: ${url}\nRequest: ${JSON.stringify(await request.json())}\n`,
+    );
+
     const clonedResponse = await fetch(`${process.env.OLLAMA_ENDPOINT}${url}`, init);
 
     if (!clonedResponse.ok || !clonedResponse.body) {
-      return NextResponse.json(
-        { error: `Ollama error: ${clonedResponse.statusText}` },
-        { status: clonedResponse.status },
-      );
+      throw new Error(await clonedResponse.json());
     }
 
     const headers = new Headers(clonedResponse.headers);
@@ -52,6 +54,38 @@ export async function cloneRequest(request: NextRequest, url: string) {
       status: clonedResponse.status,
     });
   } catch (error) {
-    return NextResponse.json({ message: error }, { status: 500 });
+    console.log(`${error}\n`);
+    return NextResponse.json({ error: `Ollama Error - ${error}` }, { status: 500 });
   }
+}
+
+export async function validateHeaders(request: NextRequest) {
+  const uid = request.headers.get('uid');
+  const email = request.headers.get('email');
+
+  // If the middleware is passed with special token
+  if (!uid || !email) {
+    return NextResponse.json({ message: 'Apps cannot access this route' }, { status: 400 });
+  }
+
+  return { uid, email };
+}
+
+export async function validateAppDev(request: NextRequest) {
+  // TODO: Uncomment this when done with AppDev member parser
+  console.log(request);
+  // const uid = request.headers.get('uid');
+
+  // // User request
+  // if (uid) {
+  //   const user = await getUserByUid(uid);
+  //   if (!user || !user.isAppDev) {
+  //     // Not an appdev user
+  //     return NextResponse.json(
+  //       { message: 'Only AppDev users can use this feature' },
+  //       { status: 403 },
+  //     );
+  //   }
+  // }
+  return {};
 }

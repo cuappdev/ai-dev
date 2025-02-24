@@ -41,7 +41,7 @@ export default function ChatPage() {
         }
 
         const data = await response.json();
-        setMessages(data.messages);
+        setMessages(data.chat.messages);
 
         if (data.messages && data.messages.length == 1) {
           initiateResponse(data.messages[data.messages.length - 1].content, []);

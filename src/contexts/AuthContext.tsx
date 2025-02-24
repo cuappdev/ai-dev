@@ -1,14 +1,18 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import {
-  signInWithPopup,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  User,
-} from 'firebase/auth';
+import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { User as PrismaUser } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { auth, provider } from '@/firebase';
+
+interface User {
+  uid: string;
+  email: string;
+  isAppDev: boolean;
+  displayName: string;
+  photoURL: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -70,25 +74,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!user && currentUser) {
         try {
           const token = await currentUser.getIdToken();
-          // Validate firebase token
-          const firebaseMiddlewareResponse = await fetch('/api/login', {
+          // Validate firebase token and set cookie
+          const firebaseResponse = await fetch('/api/login', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
-          if (!firebaseMiddlewareResponse.ok) {
+          if (!firebaseResponse.ok) {
             await signOut();
-            throw new Error(await firebaseMiddlewareResponse.text());
+            throw new Error(await firebaseResponse.text());
           }
 
-          // Ensure user is in the database
+          // Ensures Cornell email and upserts a user which is returned
           const userResponse = await fetch('/api/authenticate');
           if (!userResponse.ok) {
             await signOut();
             throw new Error(await userResponse.text());
           }
 
-          setUser(currentUser);
+          const userInfo: PrismaUser = (await userResponse.json()).user;
+
+          setUser({
+            uid: userInfo.uid!,
+            email: userInfo.email,
+            isAppDev: userInfo.isAppDev,
+            displayName: currentUser.displayName!,
+            photoURL: currentUser.photoURL!,
+          });
         } catch (error) {
           setError(JSON.parse((error as Error).message).message);
           setUser(null);

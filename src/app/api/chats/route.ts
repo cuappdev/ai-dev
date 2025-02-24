@@ -1,12 +1,14 @@
+import { getChatsByUid } from '@/app/utils/databaseUtils';
+import { validateHeaders } from '@/app/utils/requestUtils';
 import { NextRequest, NextResponse } from 'next/server';
-import { getChatsByEmail } from '@/app/utils/databaseUtils';
 
 export async function GET(request: NextRequest) {
-  const email = request.headers.get('email');
-  if (!email) {
-    return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
+  const validatedHeaders = await validateHeaders(request);
+  if (validatedHeaders instanceof NextResponse) {
+    return validatedHeaders;
   }
 
-  const chats = await getChatsByEmail(email);
-  return NextResponse.json({ chats: chats });
+  const { uid } = validatedHeaders;
+  const chats = await getChatsByUid(uid);
+  return NextResponse.json({ chats: chats }, { status: 200 });
 }

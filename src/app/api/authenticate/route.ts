@@ -1,16 +1,28 @@
-import { getUserByEmail, upsertUser } from '@/app/utils/databaseUtils';
+import { getUserByUid, updateUserEmailByUid, upsertUser } from '@/app/utils/databaseUtils';
+import { validateHeaders } from '@/app/utils/requestUtils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const email = request.headers.get('email');
-  if (!email) {
-    return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
+  const validatedHeaders = await validateHeaders(request);
+  if (validatedHeaders instanceof NextResponse) {
+    return validatedHeaders;
   }
 
-  const user = await getUserByEmail(email);
-  if (!user) {
-    await upsertUser(email);
+  const { uid, email } = validatedHeaders;
+  let user = await getUserByUid(uid);
+
+  // User was created before
+  if (user) {
+    if (user.email === email) {
+      return NextResponse.json({ user: user }, { status: 200 });
+    }
+
+    // User changed their email
+    const newUser = await updateUserEmailByUid(uid, email);
+    return NextResponse.json({ user: newUser }, { status: 200 });
   }
-  // TODO: Return back user to frontend to store, should contain name, pfp, email, isAppDev
-  return NextResponse.json({});
+
+  // User was not created - either create a new user for non-Appdev or update uid of AppDev user
+  user = await upsertUser(email, uid);
+  return NextResponse.json({ user: user }, { status: 201 });
 }

@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// TODO: Finish
 const appDevEmails = ['a@cornell.edu', 'b@cornell.edu', 'c@cornell.edu'];
 
 async function main() {

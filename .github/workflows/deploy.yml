@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   path-context:
@@ -39,6 +36,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
+          # TODO: Remove SSH passphrase
           passphrase: ${{ secrets.SERVER_PASSPHRASE }}
           script: |
             export IMAGE_TAG=${{ steps.vars.outputs.sha_short }}

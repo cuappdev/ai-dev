@@ -4,11 +4,12 @@ import { authMiddleware } from 'next-firebase-auth-edge';
 const { privateKey } = JSON.parse(process.env.FIREBASE_ADMIN_PRIVATE_KEY!);
 
 export async function middleware(request: NextRequest) {
-  // TODO: Move check for user in database once Node.js runtime support is added to next middleware (https://github.com/vercel/next.js/discussions/71727)
+  // TODO: Move check for user in database once Node.js runtime support is added to Next middleware (https://github.com/vercel/next.js/discussions/71727)
+  // TODO: Create 1 endpoint for authContext to hit after ^
   return authMiddleware(request, {
-    // Sets cookie
+    // Dummy endpoint (no route function), validates token in header and sets cookie
     loginPath: '/api/login',
-    // Deletes cookie
+    // Dummy endpoint (no route function), deletes cookie
     logoutPath: '/api/logout',
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
     cookieName: process.env.AUTH_COOKIE_NAME!,
@@ -28,17 +29,18 @@ export async function middleware(request: NextRequest) {
       clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL!,
       privateKey,
     },
-    // Not called on login
     handleValidToken: async ({ decodedToken }, headers) => {
+      // Ensures Cornell email
       if (!decodedToken.email!.toLowerCase().endsWith('@cornell.edu')) {
         return NextResponse.json(
           { message: 'Please sign in with your Cornell email.' },
-          { status: 401, headers: headers },
+          { status: 403, headers: headers },
         );
       }
 
       // Pass along headers to be used by the routes
       const forwardedHeaders = new Headers(headers);
+      forwardedHeaders.set('uid', decodedToken.uid);
       forwardedHeaders.set('email', decodedToken.email!);
       return NextResponse.next({
         request: {
@@ -46,7 +48,7 @@ export async function middleware(request: NextRequest) {
         },
       });
     },
-    handleInvalidToken: async (message) => {
+    handleInvalidToken: async (errorMessage) => {
       // Special authentication for apps
       const token = request.headers.get('Authorization')?.split('Bearer ')[1];
       if (token === process.env.SPECIAL_TOKEN) {
@@ -56,7 +58,10 @@ export async function middleware(request: NextRequest) {
           },
         });
       }
-      return NextResponse.json({ message: `Please login again - ${message}` }, { status: 401 });
+      return NextResponse.json(
+        { message: `Please login again - ${errorMessage}` },
+        { status: 401 },
+      );
     },
     handleError: async (error) => {
       return NextResponse.json({ message: (error as Error).message }, { status: 500 });
@@ -75,7 +80,7 @@ export const config = {
     '/api/chats/:path',
     '/api/embed',
     '/api/chats',
-    // Auth routes - used by library for cookie management
+    // Dummy auth routes - used by library for cookie management
     '/api/login',
     '/api/logout',
   ],
