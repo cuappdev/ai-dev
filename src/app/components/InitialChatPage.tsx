@@ -54,7 +54,11 @@ export default function InitialChatPage() {
             </span>
           </div>
 
-          <InputField onSubmit={handleInitialSendMessage} messageStreaming={false} />
+          <InputField
+            onSubmit={handleInitialSendMessage}
+            onAbort={() => {}}
+            messageStreaming={false}
+          />
         </div>
       </div>
       <Toast />
