@@ -94,7 +94,7 @@ export async function validateHeaders(request: NextRequest) {
     return NextResponse.json({ message: 'Apps cannot access this route' }, { status: 400 });
   }
 
-  return { uid, email };
+  return { uid: uid.trim(), email: email.trim() };
 }
 
 export async function validateAppDev(request: NextRequest) {
