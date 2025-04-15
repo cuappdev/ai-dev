@@ -8,9 +8,10 @@ export async function createClonedRequest(request: NextRequest) {
       ? await request.clone().text()
       : undefined;
 
-  let parsedBody = originalBody ? JSON.parse(originalBody) : undefined;
-  let lastMessage = parsedBody?.messages?.[parsedBody.messages.length - 1]?.content;
-  let updatedLastMessage = originalBody ? await notionDispatch(lastMessage) : undefined;
+  const parsedBody = originalBody ? JSON.parse(originalBody) : undefined;
+  const lastMessage = parsedBody?.messages?.[parsedBody.messages.length - 1]?.content;
+  const updatedLastMessage =
+    lastMessage !== undefined ? await notionDispatch(lastMessage) : undefined;
 
   if (parsedBody?.messages && updatedLastMessage !== undefined) {
     parsedBody.messages[parsedBody.messages.length - 1].content = updatedLastMessage;
@@ -94,7 +95,7 @@ export async function validateHeaders(request: NextRequest) {
     return NextResponse.json({ message: 'Apps cannot access this route' }, { status: 400 });
   }
 
-  return { uid: uid.trim(), email: email.trim() };
+  return { uid, email };
 }
 
 export async function validateAppDev(request: NextRequest) {
