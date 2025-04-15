@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import { Client } from '@notionhq/client';
 import {
@@ -54,6 +55,7 @@ async function main() {
         isAppDev: isAppDev,
       },
       create: {
+        uid: randomUUID(),
         email: email,
         isAppDev: isAppDev,
       },
