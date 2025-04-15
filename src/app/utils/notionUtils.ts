@@ -1,3 +1,9 @@
+import {
+  DatabaseObjectResponse,
+  PageObjectResponse,
+  PartialDatabaseObjectResponse,
+  PartialPageObjectResponse,
+} from '@notionhq/client/build/src/api-endpoints';
 import { notion } from '../../notion';
 
 // Caches the attendance data to avoid fetching it multiple times in a day
@@ -21,30 +27,55 @@ async function appendSlipDays(message: string): Promise<string> {
 
 async function fetchAttendanceData(): Promise<string> {
   const databaseId = process.env.SP25_NOTION_ATTENDANCE_DATABASE_ID!;
+  let allResults: (
+    | PageObjectResponse
+    | PartialPageObjectResponse
+    | PartialDatabaseObjectResponse
+    | DatabaseObjectResponse
+  )[] = [];
+  let hasMore = true;
+  let startCursor: string | undefined = undefined;
+
   try {
-    const response = await notion.databases.query({
-      database_id: databaseId,
-      filter: {
-        property: 'Status',
-        select: {
-          equals: 'Active',
+    while (hasMore) {
+      const response = await notion.databases.query({
+        database_id: databaseId,
+        start_cursor: startCursor,
+        filter: {
+          property: 'Status',
+          select: {
+            equals: 'Active',
+          },
         },
-      },
-    });
+      });
+
+      allResults = allResults.concat(response.results);
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
 
     let attendanceData = 'Name|Absence Dates|Late Dates|IWS Makeups|Slip Days Remaining\n';
-    attendanceData += response.results
-      .map((row: any) => {
-        const props = row.properties || {};
-        const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
-        const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
-        const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? '';
-        const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? '';
-        const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? '';
-        const slipDays = props['Slip Days Remaining']?.formula?.number ?? 0;
+    attendanceData += allResults
+      .map(
+        (
+          row:
+            | PageObjectResponse
+            | PartialPageObjectResponse
+            | PartialDatabaseObjectResponse
+            | DatabaseObjectResponse,
+        ) => {
+          // @ts-ignore
+          const props = row.properties || {};
+          const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
+          const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
+          const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? '';
+          const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? '';
+          const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? '';
+          const slipDays = props['Slip Days Remaining']?.formula?.number ?? 0;
 
-        return `${firstName} ${lastName}|${absences}|${lates}|${iws}|${slipDays}`;
-      })
+          return `${firstName} ${lastName}|${absences}|${lates}|${iws}|${slipDays}`;
+        },
+      )
       .join('\n');
 
     return attendanceData;
