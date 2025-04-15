@@ -11,9 +11,16 @@ let cachedAttendanceData: string | null = null;
 let lastQueryDate: Date | null = null;
 
 export async function notionDispatch(message: string): Promise<string> {
+  let dispatched = false;
   const wordSet = new Set<string>(message.trim().toLowerCase().split(' '));
   if (wordSet.has('slip') && (wordSet.has('day') || wordSet.has('days'))) {
     message = await appendSlipDays(message);
+    dispatched = true;
+  }
+
+  if (dispatched) {
+    message +=
+      '\nYou are a customer service agent that helps a customer with answering questions. Please answer the question based on the provided context above. Make sure not to make any changes to the context, if possible, when preparing answers to provide accurate responses.  If the answer cannot be found in context, just politely say that you do not know, do not try to make up an answer.';
   }
   return message;
 }
@@ -68,10 +75,10 @@ async function fetchAttendanceData(): Promise<string> {
           const props = row.properties || {};
           const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
           const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
-          const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? '';
-          const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? '';
-          const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? '';
-          const slipDays = props['Slip Days Remaining']?.formula?.number ?? 0;
+          const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? 'None';
+          const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? 'None';
+          const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? 'None';
+          const slipDays = props['Slip Days Remaining']?.formula?.number ?? 3;
 
           return `${firstName} ${lastName}|${absences}|${lates}|${iws}|${slipDays}`;
         },
