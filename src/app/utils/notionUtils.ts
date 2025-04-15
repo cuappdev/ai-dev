@@ -1,5 +1,9 @@
 import { notion } from '../../notion';
 
+// Caches the attendance data to avoid fetching it multiple times in a day
+let cachedAttendanceData: string | null = null;
+let lastQueryDate: Date | null = null;
+
 export async function notionDispatch(message: string): Promise<string> {
   const wordSet = new Set<string>(message.trim().toLowerCase().split(' '));
   if (wordSet.has('slip') && (wordSet.has('day') || wordSet.has('days'))) {
@@ -9,6 +13,13 @@ export async function notionDispatch(message: string): Promise<string> {
 }
 
 async function appendSlipDays(message: string): Promise<string> {
+  const attendanceData = await getCachedAttendanceData();
+  message += '\nAttendance Info:\n';
+  message += attendanceData;
+  return message;
+}
+
+async function fetchAttendanceData(): Promise<string> {
   const databaseId = process.env.SP25_NOTION_ATTENDANCE_DATABASE_ID!;
   try {
     const response = await notion.databases.query({
@@ -21,10 +32,8 @@ async function appendSlipDays(message: string): Promise<string> {
       },
     });
 
-    message += '\nAttendance and Slip Day Information:\n';
-    message += `Name | Absence Dates | Late Dates | IWS Makeups | Slip Days Remaining\n`;
-
-    message += response.results
+    let attendanceData = 'Name,Absence,Late,IWS,Slip Days\n';
+    attendanceData += response.results
       .map((row: any) => {
         const props = row.properties || {};
         const firstName = props['First Name']?.title?.[0]?.text?.content ?? 'Unknown';
@@ -34,13 +43,29 @@ async function appendSlipDays(message: string): Promise<string> {
         const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? '';
         const slipDays = props['Slip Days Remaining']?.formula?.number ?? 0;
 
-        return `${firstName} ${lastName} | ${absences} | ${lates} | ${iws} | ${slipDays}`;
+        return `${firstName} ${lastName},${absences},${lates},${iws},${slipDays}`;
       })
       .join('\n');
-    return message;
+
+    return attendanceData;
   } catch (err) {
     console.error('Notion query failed:', err);
-    message += '\n[Error fetching slip day info from Notion]\n';
-    return message;
+    return '[Error fetching slip day info from Notion]';
   }
+}
+
+async function getCachedAttendanceData(): Promise<string> {
+  const today = new Date();
+  if (
+    cachedAttendanceData &&
+    lastQueryDate &&
+    lastQueryDate.toDateString() === today.toDateString()
+  ) {
+    return cachedAttendanceData;
+  }
+
+  // Update cache
+  cachedAttendanceData = await fetchAttendanceData();
+  lastQueryDate = today;
+  return cachedAttendanceData;
 }
