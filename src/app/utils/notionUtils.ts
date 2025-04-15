@@ -32,18 +32,18 @@ async function fetchAttendanceData(): Promise<string> {
       },
     });
 
-    let attendanceData = 'Name,Absence,Late,IWS,Slip Days\n';
+    let attendanceData = 'Name|Absence Dates|Late Dates|IWS Makeups|Slip Days Remaining\n';
     attendanceData += response.results
       .map((row: any) => {
         const props = row.properties || {};
-        const firstName = props['First Name']?.title?.[0]?.text?.content ?? 'Unknown';
+        const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
         const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
         const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? '';
         const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? '';
         const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? '';
         const slipDays = props['Slip Days Remaining']?.formula?.number ?? 0;
 
-        return `${firstName} ${lastName},${absences},${lates},${iws},${slipDays}`;
+        return `${firstName} ${lastName}|${absences}|${lates}|${iws}|${slipDays}`;
       })
       .join('\n');
 
