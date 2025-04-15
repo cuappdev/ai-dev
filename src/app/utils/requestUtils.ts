@@ -1,23 +1,38 @@
 // import { getUserByUid } from './databaseUtils';
+import { notionDispatch } from './notionUtils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function createClonedRequest(request: NextRequest) {
+  const originalBody =
+    request.method !== 'GET' && request.method !== 'HEAD'
+      ? await request.clone().text()
+      : undefined;
+
+  let parsedBody = originalBody ? JSON.parse(originalBody) : undefined;
+  let lastMessage = parsedBody?.messages?.[parsedBody.messages.length - 1]?.content;
+  let updatedLastMessage = originalBody ? await notionDispatch(lastMessage) : undefined;
+
+  if (parsedBody?.messages && updatedLastMessage !== undefined) {
+    parsedBody.messages[parsedBody.messages.length - 1].content = updatedLastMessage;
+  }
+
+  const updatedBody = JSON.stringify(parsedBody);
+
   const init: RequestInit = {
     method: request.method,
     headers: (() => {
       const headers = new Headers();
       request.headers.forEach((value, key) => {
-        if (['authorization', 'origin', 'referer', 'host'].includes(key.toLowerCase())) {
+        const lowerKey = key.toLowerCase();
+        if (['authorization', 'origin', 'referer', 'host', 'content-length'].includes(lowerKey)) {
           return;
         }
         headers.append(key, value);
       });
+      headers.set('Content-Type', 'application/json');
       return headers;
     })(),
-    body:
-      request.method !== 'GET' && request.method !== 'HEAD'
-        ? await request.clone().text()
-        : undefined,
+    body: updatedBody,
   };
   return init;
 }
@@ -26,8 +41,19 @@ export async function cloneRequest(request: NextRequest, url: string) {
   const init: RequestInit = await createClonedRequest(request);
 
   try {
+    let requestBody = null;
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      try {
+        requestBody = await request.json();
+      } catch (error) {
+        console.log('Error parsing request body:', error);
+      }
+    }
+
     console.log(
-      `\nSending Request at ${new Date()}.\nURL: ${url}\nRequest: ${JSON.stringify(await request.json())}\n`,
+      `\nSending Request at ${new Date()}.\nURL: ${url}\nRequest: ${
+        requestBody ? JSON.stringify(requestBody) : 'No body or invalid JSON'
+      }\n`,
     );
 
     const clonedResponse = await fetch(`${process.env.OLLAMA_ENDPOINT}${url}`, init);
