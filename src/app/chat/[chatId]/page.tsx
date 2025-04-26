@@ -262,6 +262,10 @@ export default function ChatPage() {
 
   const displayError = (error: unknown) => {
     if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return;
+      }
+
       const errorMessage = {
         id: `${messages.length + 1}`,
         chatId: chatId,

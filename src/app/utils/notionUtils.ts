@@ -74,29 +74,44 @@ async function fetchAttendanceData(): Promise<string> {
       startCursor = response.next_cursor ?? undefined;
     }
 
-    let attendanceData = 'Name|Absence Dates|Late Dates|IWS Makeups|Slip Days Remaining\n';
-    attendanceData += allResults
-      .map(
-        (
-          row:
-            | PageObjectResponse
-            | PartialPageObjectResponse
-            | PartialDatabaseObjectResponse
-            | DatabaseObjectResponse,
-        ) => {
-          // @ts-ignore
-          const props = row.properties || {};
-          const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
-          const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
-          const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? 'None';
-          const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? 'None';
-          const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? 'None';
-          const slipDays = props['Slip Days Remaining']?.formula?.number ?? 3;
+    let attendanceData = JSON.stringify({
+      header: 'SLIP DAY INFORMATION',
+      students: allResults.map((row) => {
+        // @ts-ignore
+        const props = row.properties || {};
+        return {
+          name: `${props['First Name']?.title?.[0]?.text?.content ?? ''} ${props['Last Name']?.rich_text?.[0]?.plain_text ?? ''}`,
+          // absences: props['Absence Dates']?.rich_text?.[0]?.plain_text ?? 'None',
+          // lateDates: props['Late Dates']?.rich_text?.[0]?.plain_text ?? 'None',
+          // iwsMakeups: props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? 'None',
+          slipDaysRemaining: props['Slip Days Remaining']?.formula?.number ?? 3,
+        };
+      }),
+    });
 
-          return `${firstName} ${lastName}|${absences}|${lates}|${iws}|${slipDays}`;
-        },
-      )
-      .join('\n');
+    // let attendanceData = 'Name|Absence Dates|Late Dates|IWS Makeups|Slip Days Remaining\n';
+    // attendanceData += allResults
+    //   .map(
+    //     (
+    //       row:
+    //         | PageObjectResponse
+    //         | PartialPageObjectResponse
+    //         | PartialDatabaseObjectResponse
+    //         | DatabaseObjectResponse,
+    //     ) => {
+    //       // @ts-ignore
+    //       const props = row.properties || {};
+    //       const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
+    //       const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
+    //       const absences = props['Absence Dates']?.rich_text?.[0]?.plain_text ?? 'None';
+    //       const lates = props['Late Dates']?.rich_text?.[0]?.plain_text ?? 'None';
+    //       const iws = props['IWS Makeups']?.rich_text?.[0]?.plain_text ?? 'None';
+    //       const slipDays = props['Slip Days Remaining']?.formula?.number ?? 3;
+
+    //       return `${firstName} ${lastName}|${absences}|${lates}|${iws}|${slipDays}`;
+    //     },
+    //   )
+    //   .join('\n');
 
     console.timeEnd('fetchAttendanceData');
     return attendanceData;
@@ -152,29 +167,40 @@ async function fetchPodData(podName: string, databaseId: string): Promise<string
       startCursor = response.next_cursor ?? undefined;
     }
 
-    let podData = 'Name|Subteam|Status|Due Date\n';
-    // name, status, subteam, due date
-    podData += allResults
-      .map(
-        (
-          row:
-            | PageObjectResponse
-            | PartialPageObjectResponse
-            | PartialDatabaseObjectResponse
-            | DatabaseObjectResponse,
-        ) => {
-          // @ts-ignore
-          const props = row.properties || {};
-          const name = props['Name']?.title[0]?.text?.content ?? '?';
-          const status = props['Status']?.status?.name ?? '?';
-          const subteam = props['Subteam']?.multi_select?.[0]?.name ?? '?';
-          const dueDate = props['Due Date']?.date?.start ?? '?';
+    let podData = JSON.stringify({
+      tickets: allResults.map((row) => {
+        // @ts-ignore
+        const props = row.properties || {};
+        return {
+          name: props['Name']?.title[0]?.text?.content ?? 'Unknown',
+          subteam: props['Subteam']?.multi_select?.[0]?.name ?? 'Unassigned',
+          status: props['Status']?.status?.name ?? 'Unknown',
+          dueDate: props['Due Date']?.date?.start ?? 'No deadline set',
+        };
+      }),
+    });
 
-          return `${name}|${subteam}|${status}|${dueDate}`;
-        },
-      )
-      .join('\n');
-    console.log('Pod data:', podData);
+    // let podData = 'Name|Subteam|Status|Due Date\n';
+    // podData += allResults
+    //   .map(
+    //     (
+    //       row:
+    //         | PageObjectResponse
+    //         | PartialPageObjectResponse
+    //         | PartialDatabaseObjectResponse
+    //         | DatabaseObjectResponse,
+    //     ) => {
+    //       // @ts-ignore
+    //       const props = row.properties || {};
+    //       const name = props['Name']?.title[0]?.text?.content ?? '?';
+    //       const status = props['Status']?.status?.name ?? '?';
+    //       const subteam = props['Subteam']?.multi_select?.[0]?.name ?? '?';
+    //       const dueDate = props['Due Date']?.date?.start ?? '?';
+
+    //       return `${name}|${subteam}|${status}|${dueDate}`;
+    //     },
+    //   )
+    //   .join('\n');
 
     console.timeEnd('fetchPodData');
     return podData;
