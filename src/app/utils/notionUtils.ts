@@ -11,17 +11,26 @@ let cachedAttendanceData: string | null = null;
 let lastQueryDate: Date | null = null;
 
 export async function notionDispatch(message: string): Promise<string> {
-  let dispatched = false;
   const wordSet = new Set<string>(message.trim().toLowerCase().split(' '));
   if (wordSet.has('slip') && (wordSet.has('day') || wordSet.has('days'))) {
     message = await appendSlipDays(message);
-    dispatched = true;
+  }
+  if (wordSet.has('eatery')) {
+    message = await appendPod(message, 'eatery', process.env.SP25_EATERY_NOTION!);
+  }
+  if (wordSet.has('resell')) {
+    message = await appendPod(message, 'resell', process.env.SP25_RESELL_NOTION!);
+  }
+  if (wordSet.has('uplift')) {
+    message = await appendPod(message, 'uplift', process.env.SP25_UPLIFT_NOTION!);
+  }
+  if (wordSet.has('transit')) {
+    message = await appendPod(message, 'transit', process.env.SP25_TRANSIT_NOTION!);
+  }
+  if (wordSet.has('score')) {
+    message = await appendPod(message, 'score', process.env.SP25_SCORE_NOTION!);
   }
 
-  if (dispatched) {
-    message +=
-      '\nYou are a customer service agent that helps a customer with answering questions. Please answer the question based on the provided context above. Make sure not to make any changes to the context, if possible, when preparing answers to provide accurate responses.  If the answer cannot be found in context, just politely say that you do not know, do not try to make up an answer.';
-  }
   return message;
 }
 
@@ -106,4 +115,65 @@ async function getCachedAttendanceData(): Promise<string> {
   cachedAttendanceData = await fetchAttendanceData();
   lastQueryDate = today;
   return cachedAttendanceData;
+}
+
+async function appendPod(message: string, podName: string, pageId: string): Promise<string> {
+  const podData = await fetchPodData(podName, pageId);
+  message += '\nPod Info:\n';
+  message += podData;
+  return message;
+}
+
+async function fetchPodData(podName: string, pageId: string): Promise<string> {
+  let allResults: (
+    | PageObjectResponse
+    | PartialPageObjectResponse
+    | PartialDatabaseObjectResponse
+    | DatabaseObjectResponse
+  )[] = [];
+  const response = await notion.pages.retrieve({ page_id: pageId });
+  console.log(response);
+
+  // let hasMore = true;
+  // let startCursor: string | undefined = undefined;
+
+  try {
+    // while (hasMore) {
+    //   const response = await notion.databases.query({
+    //     database_id: podPageId,
+    //     start_cursor: startCursor,
+    //   });
+
+    //   allResults = allResults.concat(response.results);
+    //   hasMore = response.has_more;
+    //   startCursor = response.next_cursor ?? undefined;
+    // }
+
+    let podData = 'Name|Pod|Status\n';
+    // podData += allResults
+    //   .map(
+    //     (
+    //       row:
+    //         | PageObjectResponse
+    //         | PartialPageObjectResponse
+    //         | PartialDatabaseObjectResponse
+    //         | DatabaseObjectResponse,
+    //     ) => {
+    //       // @ts-ignore
+    //       const props = row.properties || {};
+    //       const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
+    //       const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
+    //       const pod = props['Pod']?.select?.name ?? 'None';
+    //       const status = props['Status']?.select?.name ?? 'None';
+
+    //       return `${firstName} ${lastName}|${pod}|${status}`;
+    //     },
+    //   )
+    //   .join('\n');
+
+    return podData;
+  } catch (err) {
+    console.error('Notion query failed:', err);
+    return `[Error fetching ${podName} info from Notion]`;
+  }
 }

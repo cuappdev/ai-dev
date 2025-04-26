@@ -15,6 +15,7 @@ import ChatMenu from '@/app/components/chat/ChatMenu';
 import ChatHeader from '@/app/components/chat/ChatHeader';
 import InputField from '@/app/components/InputField';
 import ChatMessage from '@/app/components/chat/ChatMessage';
+import { toast } from 'react-toastify';
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -28,31 +29,79 @@ export default function ChatPage() {
   const controllerRef = useRef<AbortController | null>(null);
 
   // TODO: Change title of page to summary of the chat on each page
-  // TODO: Fix navbar toggle and rerendering
 
+  // Get or create chat if it doesn't exist
   useEffect(() => {
-    // TODO: Add loading indicators
+    const createChat = async (message: string, files: FileComponent[]) => {
+      setMessageStreaming(true);
+      setMessages(() => [
+        {
+          id: `${messages.length}`,
+          chatId: chatId,
+          content: message,
+          images: files.map((file) => file.base64),
+          timestamp: new Date().toLocaleString(),
+          sender: 'user',
+        },
+        {
+          id: `${messages.length + 1}`,
+          chatId: chatId,
+          content: ``,
+          images: [],
+          timestamp: new Date().toLocaleString(),
+          sender: selectedModel,
+        },
+      ]);
+
+      try {
+        const response = await fetch(`/api/chats/${chatId}`, {
+          method: 'POST',
+          body: JSON.stringify({
+            content: message,
+            images: files,
+            timestamp: new Date(),
+            sender: 'user',
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to create chat');
+        }
+        const data = await response.json();
+        setMessages(data.chat.messages);
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    };
+
     const fetchChat = async () => {
-      if (hasFetched.current) return; // Prevent second execution
-      hasFetched.current = true;
       try {
         const response = await fetch(`/api/chats/${chatId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch chat');
         }
-
         const data = await response.json();
         setMessages(data.chat.messages);
-
-        if (data.messages && data.messages.length == 1) {
-          initiateResponse(data.messages[data.messages.length - 1].content, []);
-        }
       } catch (error) {
-        console.error(error);
+        toast.error((error as Error).message);
       }
     };
-    fetchChat();
-  });
+
+    const initializeChat = async () => {
+      const initialMessage = localStorage.getItem('initialMessage');
+      if (initialMessage) {
+        await createChat(initialMessage, []);
+        localStorage.removeItem('initialMessage');
+        setMessageStreaming(false);
+        initiateResponse(initialMessage, []);
+      } else {
+        await fetchChat();
+      }
+    };
+
+    if (hasFetched.current) return; // Prevent second execution
+    hasFetched.current = true;
+    initializeChat();
+  }, [chatId]);
 
   // TODO: Add button to scroll to bottom of chat
   useEffect(() => {
