@@ -9,6 +9,10 @@ services:
     command: ['npx', 'prisma', 'db', 'seed']
     env_file:
       - .env
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
     volumes:
       - ./ca-certificate.crt:/app/ca-certificate.crt:ro
 
