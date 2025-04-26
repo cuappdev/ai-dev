@@ -49,7 +49,7 @@ export default function ChatMessage({ lastMessage, streaming, message }: ChatMes
     } else if (lowercaseSender.includes('mario')) {
       return '/mario.png';
     } else {
-      return '/ollama.png';
+      return '/appdev.png';
     }
   };
 
