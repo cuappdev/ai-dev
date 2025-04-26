@@ -8,7 +8,10 @@ import { notion } from '../../notion';
 
 // Caches the attendance data to avoid fetching it multiple times in a day
 let cachedAttendanceData: string | null = null;
-let lastQueryDate: Date | null = null;
+let lastAttendanceQueryDate: Date | null = null;
+
+// Caches the pod data to avoid fetching it multiple times in a day
+let cachedPodData: Record<string, { data: string; lastQueryDate: Date }> | null = null;
 
 export async function notionDispatch(message: string): Promise<string> {
   const wordSet = new Set<string>(message.trim().toLowerCase().split(' '));
@@ -16,19 +19,19 @@ export async function notionDispatch(message: string): Promise<string> {
     message = await appendSlipDays(message);
   }
   if (wordSet.has('eatery')) {
-    message = await appendPod(message, 'eatery', process.env.SP25_EATERY_NOTION!);
+    message = await appendPodData(message, 'eatery', process.env.SP25_EATERY_DATABASE!);
   }
   if (wordSet.has('resell')) {
-    message = await appendPod(message, 'resell', process.env.SP25_RESELL_NOTION!);
+    message = await appendPodData(message, 'resell', process.env.SP25_RESELL_DATABASE!);
   }
   if (wordSet.has('uplift')) {
-    message = await appendPod(message, 'uplift', process.env.SP25_UPLIFT_NOTION!);
+    message = await appendPodData(message, 'uplift', process.env.SP25_UPLIFT_DATABASE!);
   }
   if (wordSet.has('transit')) {
-    message = await appendPod(message, 'transit', process.env.SP25_TRANSIT_NOTION!);
+    message = await appendPodData(message, 'transit', process.env.SP25_TRANSIT_DATABASE!);
   }
   if (wordSet.has('score')) {
-    message = await appendPod(message, 'score', process.env.SP25_SCORE_NOTION!);
+    message = await appendPodData(message, 'score', process.env.SP25_SCORE_DATABASE!);
   }
 
   return message;
@@ -53,6 +56,7 @@ async function fetchAttendanceData(): Promise<string> {
   let startCursor: string | undefined = undefined;
 
   try {
+    console.time('fetchAttendanceData');
     while (hasMore) {
       const response = await notion.databases.query({
         database_id: databaseId,
@@ -94,6 +98,7 @@ async function fetchAttendanceData(): Promise<string> {
       )
       .join('\n');
 
+    console.timeEnd('fetchAttendanceData');
     return attendanceData;
   } catch (err) {
     console.error('Notion query failed:', err);
@@ -105,75 +110,101 @@ async function getCachedAttendanceData(): Promise<string> {
   const today = new Date();
   if (
     cachedAttendanceData &&
-    lastQueryDate &&
-    lastQueryDate.toDateString() === today.toDateString()
+    lastAttendanceQueryDate &&
+    lastAttendanceQueryDate.toDateString() === today.toDateString()
   ) {
     return cachedAttendanceData;
   }
 
   // Update cache
   cachedAttendanceData = await fetchAttendanceData();
-  lastQueryDate = today;
+  lastAttendanceQueryDate = today;
   return cachedAttendanceData;
 }
 
-async function appendPod(message: string, podName: string, pageId: string): Promise<string> {
-  const podData = await fetchPodData(podName, pageId);
-  message += '\nPod Info:\n';
+async function appendPodData(message: string, podName: string, pageId: string): Promise<string> {
+  const podData = await getCachedPodData(podName, pageId);
+  message += `\n${podName} Info:\n`;
   message += podData;
   return message;
 }
 
-async function fetchPodData(podName: string, pageId: string): Promise<string> {
+async function fetchPodData(podName: string, databaseId: string): Promise<string> {
   let allResults: (
     | PageObjectResponse
     | PartialPageObjectResponse
     | PartialDatabaseObjectResponse
     | DatabaseObjectResponse
   )[] = [];
-  const response = await notion.pages.retrieve({ page_id: pageId });
-  console.log(response);
-
-  // let hasMore = true;
-  // let startCursor: string | undefined = undefined;
+  let hasMore = true;
+  let startCursor: string | undefined = undefined;
 
   try {
-    // while (hasMore) {
-    //   const response = await notion.databases.query({
-    //     database_id: podPageId,
-    //     start_cursor: startCursor,
-    //   });
+    console.time('fetchPodData');
+    while (hasMore) {
+      const response = await notion.databases.query({
+        database_id: databaseId,
+        start_cursor: startCursor,
+      });
 
-    //   allResults = allResults.concat(response.results);
-    //   hasMore = response.has_more;
-    //   startCursor = response.next_cursor ?? undefined;
-    // }
+      allResults = allResults.concat(response.results);
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
 
-    let podData = 'Name|Pod|Status\n';
-    // podData += allResults
-    //   .map(
-    //     (
-    //       row:
-    //         | PageObjectResponse
-    //         | PartialPageObjectResponse
-    //         | PartialDatabaseObjectResponse
-    //         | DatabaseObjectResponse,
-    //     ) => {
-    //       // @ts-ignore
-    //       const props = row.properties || {};
-    //       const firstName = props['First Name']?.title?.[0]?.text?.content ?? '';
-    //       const lastName = props['Last Name']?.rich_text?.[0]?.plain_text ?? '';
-    //       const pod = props['Pod']?.select?.name ?? 'None';
-    //       const status = props['Status']?.select?.name ?? 'None';
+    let podData = 'Name|Subteam|Status|Due Date\n';
+    // name, status, subteam, due date
+    podData += allResults
+      .map(
+        (
+          row:
+            | PageObjectResponse
+            | PartialPageObjectResponse
+            | PartialDatabaseObjectResponse
+            | DatabaseObjectResponse,
+        ) => {
+          // @ts-ignore
+          const props = row.properties || {};
+          const name = props['Name']?.title[0]?.text?.content ?? '?';
+          const status = props['Status']?.status?.name ?? '?';
+          const subteam = props['Subteam']?.multi_select?.[0]?.name ?? '?';
+          const dueDate = props['Due Date']?.date?.start ?? '?';
 
-    //       return `${firstName} ${lastName}|${pod}|${status}`;
-    //     },
-    //   )
-    //   .join('\n');
+          return `${name}|${subteam}|${status}|${dueDate}`;
+        },
+      )
+      .join('\n');
+    console.log('Pod data:', podData);
 
+    console.timeEnd('fetchPodData');
     return podData;
   } catch (err) {
     console.error('Notion query failed:', err);
     return `[Error fetching ${podName} info from Notion]`;
   }
+}
+
+async function getCachedPodData(podName: string, podId: string): Promise<string> {
+  const today = new Date();
+  // if (
+  //   cachedAttendanceData &&
+  //   lastAttendanceQueryDate &&
+  //   lastAttendanceQueryDate.toDateString() === today.toDateString()
+  // ) {
+  //   return cachedAttendanceData;
+  // }
+  if (cachedPodData && cachedPodData[podName] && cachedPodData[podName].lastQueryDate.toDateString() === today.toDateString()) {
+    return cachedPodData[podName].data;
+  }
+
+  // Update cache
+  const podData = await fetchPodData(podName, podId);
+  cachedPodData = {
+    ...cachedPodData,
+    [podName]: {
+      data: podData,
+      lastQueryDate: today,
+    },
+  };
+  return podData;
 }

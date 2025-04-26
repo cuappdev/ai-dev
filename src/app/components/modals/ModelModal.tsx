@@ -279,6 +279,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
                   type="text"
                   autoFocus
                   ref={createModelNameRef}
+                  placeholder="mario"
                   required
                   className="w-full rounded-md border px-3 py-2 focus:outline-none"
                 />
@@ -288,6 +289,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
                 <textarea
                   ref={createModelfileRef}
                   required
+                  placeholder={'FROM llama3.2:1b\nSYSTEM You are Mario from Super Mario Bros'}
                   className="w-full rounded-md border px-3 py-2 focus:outline-none"
                 ></textarea>
               </div>
@@ -305,6 +307,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
                 <input
                   type="text"
                   autoFocus
+                  placeholder="llama3.2:1b"
                   ref={pullModelNameRef}
                   required
                   className="w-full rounded-md border px-3 py-2 focus:outline-none"
@@ -324,6 +327,7 @@ export default function ModelModal({ loading, setLoading }: ModelModalProps) {
                 <input
                   type="text"
                   autoFocus
+                  placeholder="llama3.2:1b"
                   ref={deleteModelNameRef}
                   required
                   className="w-full rounded-md border px-3 py-2 focus:outline-none"
