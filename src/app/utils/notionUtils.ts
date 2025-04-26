@@ -186,14 +186,11 @@ async function fetchPodData(podName: string, databaseId: string): Promise<string
 
 async function getCachedPodData(podName: string, podId: string): Promise<string> {
   const today = new Date();
-  // if (
-  //   cachedAttendanceData &&
-  //   lastAttendanceQueryDate &&
-  //   lastAttendanceQueryDate.toDateString() === today.toDateString()
-  // ) {
-  //   return cachedAttendanceData;
-  // }
-  if (cachedPodData && cachedPodData[podName] && cachedPodData[podName].lastQueryDate.toDateString() === today.toDateString()) {
+  if (
+    cachedPodData &&
+    cachedPodData[podName] &&
+    cachedPodData[podName].lastQueryDate.toDateString() === today.toDateString()
+  ) {
     return cachedPodData[podName].data;
   }
 
