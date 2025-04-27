@@ -22,7 +22,11 @@ export async function notionDispatch(message: string): Promise<string> {
     message = await appendPodData(message, 'eatery', process.env.SP25_EATERY_DATABASE!);
   }
   if (wordSet.has('resell')) {
-    message = await appendPodData(message, 'resell', process.env.SP25_RESELL_DATABASE!);
+    if (wordSet.has('auth') || wordSet.has('authentication')) {
+      message = await appendResellAuth(message);
+    } else {
+      message = await appendPodData(message, 'resell', process.env.SP25_RESELL_DATABASE!);
+    }
   }
   if (wordSet.has('uplift')) {
     message = await appendPodData(message, 'uplift', process.env.SP25_UPLIFT_DATABASE!);
@@ -230,4 +234,78 @@ async function getCachedPodData(podName: string, podId: string): Promise<string>
     },
   };
   return podData;
+}
+
+export async function appendResellAuth(message: string): Promise<string> {
+  return `\nResell Auth Info:\n
+  const app: Express = createExpressServer({
+    cors: true,
+    routePrefix: '/api/',
+    controllers: controllers,
+    middlewares: middlewares,
+    currentUserChecker: async (action: any) => {
+      const authHeader = action.request.headers["authorization"];
+      if (!authHeader) {
+        throw new ForbiddenError("No authorization token provided");
+      }
+      const token = authHeader.split(' ')[1];
+      if (!token) {
+        throw new ForbiddenError("Invalid authorization token format");
+      }
+      try {
+        // Verify the token using Firebase Admin SDK
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        // Check if the email is a Cornell email
+        const email = decodedToken.email;
+        const userId = decodedToken.uid;
+        action.request.email = email;
+        action.request.firebaseUid = userId;
+        if (!email || !email.endsWith('@cornell.edu')) {
+          throw new ForbiddenError('Only Cornell email addresses are allowed');
+        }
+        // Find or create user in your database using Firebase UID
+        const manager = getManager(); 
+        let user = await manager.findOne(UserModel, { firebaseUid: userId }, 
+          { relations: ["posts", "saved", "feedbacks", "requests"] });
+        if (!user) {
+          // Check if this is the user creation route
+          const isUserCreateRoute = action.request.path === '/api/user/create' || action.request.path === 'api/authorize';
+          if (!isUserCreateRoute) {
+            throw new ForbiddenError('User not found. Please create an account first.');
+          }
+          // For user creation routes, return a minimal UserModel
+          const tempUser = new UserModel();
+          tempUser.googleId = email;
+          tempUser.firebaseUid = decodedToken.uid;
+          tempUser.isNewUser = true; 
+          return tempUser;
+        } 
+        return user;
+      } catch (error) {
+        console.log(error); //TODO delete this console.log later
+        
+        if (error instanceof ForbiddenError) {
+          throw error;
+        }
+        if (error.code == 'auth/argument-error'){
+          throw new HttpError(408, 'Request timed out while waiting for response');
+        }
+        if (error.code === 'auth/id-token-expired') {
+          throw new UnauthorizedError('Token has expired');
+        }
+        throw new UnauthorizedError('Invalid authorization token');
+      }
+    },
+    defaults: {
+      paramOptions: {
+        required: true,
+      },
+    },
+    validation: {
+      whitelist: true,
+      skipMissingProperties: true,
+      forbidUnknownValues: true,
+    },
+    defaultErrorHandler: false,
+  });\n\nUse pieces of the code above to explain your answer.`;
 }
